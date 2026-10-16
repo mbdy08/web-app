@@ -11,13 +11,56 @@
     <div class="app-container">
         <!-- شريط الرأس العلوي -->
         <header class="app-header">
-            <button id="btnMenu" class="icon-btn" aria-label="Menu">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
+            <div class="menu-wrapper">
+                <button id="btnMenu" class="icon-btn" aria-label="Menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <!-- القائمة الجانبية العائمة -->
+                <div id="floatingSideMenu" class="floating-menu" style="display: none;">
+                    <!-- 1. الدرع (سياسة الخصوصية) -->
+                    <button class="floating-btn" id="btnSidePrivacy" title="Privacy Policy">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L4 5V11C4 16.55 7.42 21.74 12 23C16.58 21.74 20 16.55 20 11V5L12 2Z" fill="#1C222E" stroke="#A0AEC0" stroke-width="1.5"/>
+                            <path d="M12 4L6 6.3V11C6 15.3 8.6 19.3 12 20.4C15.4 19.3 18 15.3 18 11V6.3L12 4Z" fill="#E52535"/>
+                            <path d="M12 4V20.4C15.4 19.3 18 15.3 18 11V6.3L12 4Z" fill="#FFFFFF" fill-opacity="0.85"/>
+                        </svg>
+                    </button>
+
+                    <!-- 2. تيليجرام -->
+                    <button class="floating-btn" id="btnSideTelegram" title="Telegram">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="11" fill="#0088CC"/>
+                            <path d="M5.5 11.8L17.5 7.2C18.1 7 18.6 7.4 18.4 8L16.3 17.5C16.2 18 15.6 18.2 15.2 17.9L12 15.4L10.4 17C10.2 17.2 9.9 17.3 9.7 17.3L10 13.5L16.8 7.6C17.1 7.3 16.7 7.2 16.4 7.4L8.2 12.5L5.6 11.6C5 11.4 5 11 5.5 11.8Z" fill="#FFFFFF"/>
+                        </svg>
+                    </button>
+
+                    <!-- 3. واتساب -->
+                    <button class="floating-btn" id="btnSideWhatsapp" title="WhatsApp">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="11" fill="#25D366"/>
+                            <path d="M17.5 14.5C17.2 14.3 15.9 13.7 15.6 13.6C15.4 13.5 15.2 13.5 15 13.8C14.8 14.1 14.3 14.7 14.1 14.9C14 15.1 13.8 15.1 13.5 15C13.2 14.8 12.3 14.5 11.3 13.6C10.5 12.9 9.9 12 9.7 11.7C9.5 11.4 9.7 11.3 9.8 11.1C10 11 10.1 10.8 10.3 10.6C10.4 10.5 10.5 10.3 10.5 10.2C10.6 10 10.6 9.9 10.5 9.7C10.4 9.6 9.9 8.3 9.7 7.7C9.5 7.2 9.3 7.3 9.1 7.3C9 7.3 8.8 7.3 8.6 7.3C8.4 7.3 8.1 7.4 7.9 7.6C7.6 7.9 7 8.5 7 9.7C7 10.9 7.9 12.1 8 12.2C8.1 12.4 9.7 14.8 12.2 15.9C14.7 16.9 14.7 16.6 15.2 16.6C15.7 16.5 16.7 15.9 17 15.2C17.2 14.5 17.2 13.9 17.1 13.8C17 13.7 17.7 14.7 17.5 14.5Z" fill="#FFFFFF"/>
+                        </svg>
+                    </button>
+
+                    <!-- 4. شير (مشاركة) -->
+                    <button class="floating-btn" id="btnSideShare" title="Share">
+                        <div class="share-circle-inner">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
 
             <div class="logo-title">
                 <span class="txt-white">NHN</span> <span class="txt-red">LIVE</span>
@@ -32,18 +75,17 @@
             </button>
         </header>
 
-        <!-- الشعار الرئيسي الدائري -->
+        <!-- الشعار الرئيسي والعناوين -->
         <div class="main-logo-area">
             <div class="logo-circle">
-                <img src="nhnlive-logo.png" alt="NHN LIVE" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png';">
+                <img src="logo.png" alt="NHN LIVE" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png';">
             </div>
             <h1 id="headerMainTitle">Direct Stream</h1>
             <p id="headerSubtitle">Paste a valid URL to start playback.</p>
         </div>
 
-        <!-- البطاقة الرئيسية الكبرى -->
+        <!-- البطاقة الرئيسية -->
         <div class="main-card">
-            <!-- الشريط الداخلي العلوي -->
             <div class="card-top-info">
                 <div class="link-icon-badge">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E52535" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -57,7 +99,7 @@
                 </div>
             </div>
 
-            <!-- أزرار التبويبات الأربعة -->
+            <!-- أزرار التبويبات -->
             <div class="tabs-row">
                 <button class="tab-btn active" data-tab="0" id="tabDirect">Direct</button>
                 <button class="tab-btn" data-tab="1" id="tabWeb">Web</button>
@@ -65,7 +107,7 @@
                 <button class="tab-btn" data-tab="3" id="tabXtream">Xtream</button>
             </div>
 
-            <!-- القسم 1: إدخال الرابط (Direct / Web / M3U) -->
+            <!-- القسم 1: Direct / Web / M3U -->
             <div id="sectionUrlInput" class="content-section">
                 <div class="input-wrapper">
                     <input type="text" id="etStreamUrl" placeholder="Paste a valid URL" autocomplete="off" spellcheck="false">
@@ -82,7 +124,7 @@
                 </button>
             </div>
 
-            <!-- القسم 2: قائمة Xtream الرئيسية -->
+            <!-- القسم 2: قائمة Xtream -->
             <div id="sectionXtreamMenu" class="content-section" style="display: none;">
                 <div class="section-heading">
                     <h4 id="txtAddProfile">Add Profile</h4>
@@ -104,7 +146,7 @@
                 </button>
             </div>
 
-            <!-- القسم 3: إدخال كود NHN Code -->
+            <!-- القسم 3: إدخال NHN Code -->
             <div id="sectionNhnCodeInput" class="content-section" style="display: none;">
                 <div class="section-heading">
                     <h4 id="txtNhnCodeTitle">NHN Code</h4>
@@ -129,7 +171,7 @@
                 </button>
             </div>
 
-            <!-- القسم 4: تسجيل دخول سيرفر Xtream الحقيقي -->
+            <!-- القسم 4: تسجيل Xtream IPTV -->
             <div id="sectionXtreamLoginInput" class="content-section" style="display: none;">
                 <div class="section-heading">
                     <h4 id="txtXtreamLoginTitle">Xtream Codes Login</h4>
@@ -163,12 +205,43 @@
         </footer>
     </div>
 
-    <!-- نافذة اختيار اللغة المنبثقة -->
+    <!-- نافذة اختيار اللغة -->
     <div id="languageModal" class="modal-backdrop" style="display: none;">
         <div class="modal-card">
             <h3 id="txtModalTitle">Choose App Language</h3>
             <button class="lang-choice-btn" id="btnChooseArabic">العربية</button>
             <button class="lang-choice-btn active" id="btnChooseEnglish">English</button>
+        </div>
+    </div>
+
+    <!-- نافذة سياسة الخصوصية الملكية (10 بنود) -->
+    <div id="privacyModal" class="privacy-modal-overlay" style="display: none;">
+        <div class="privacy-modal-window">
+            <!-- شريط العنوان والإغلاق العلوي -->
+            <div class="privacy-header-bar">
+                <button id="btnClosePrivacy" class="btn-close-privacy" aria-label="Close">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <h3 id="txtPrivacyHeaderTitle">Privacy Policy</h3>
+                <div style="width: 24px;"></div> <!-- توازن لشريط الرأس -->
+            </div>
+
+            <!-- عنوان الصفحة الرئيسي وتاريخ التحديث -->
+            <div class="privacy-top-title-area">
+                <h2 id="txtPrivacyMainTitle">Privacy Policy</h2>
+                <p id="txtPrivacySubtitle">NHN LIVE • Last updated: September 2026</p>
+            </div>
+
+            <!-- حاوية البطاقات العشر -->
+            <div id="privacyCardsContainer" class="privacy-cards-list"></div>
+
+            <!-- التذييل الملكي داخل النافذة -->
+            <div class="privacy-footer-text">
+                NHN LIVE © 2026<br>All Rights Reserved
+            </div>
         </div>
     </div>
 

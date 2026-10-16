@@ -1,11 +1,53 @@
 document.addEventListener("DOMContentLoaded", () => {
     const SECRET_CODE = "7777";
 
+    // الروابط المعتمدة
+    const TELEGRAM_CHANNEL_URL = "https://t.me/nhnlive";
+    const APP_DOWNLOAD_URL = "https://nhnlive.com/app/app-download.html";
+
     // حالة التطبيق
     let selectedTab = 0; // 0: Direct, 1: Web, 2: M3U, 3: Xtream
     let isArabic = false;
 
-    // قاموس الترجمة الكامل لجميع النصوص
+    // بنود سياسة الخصوصية العشرة (عربي وإنجليزي) بدون البند 11 وبدون زر التواصل
+    const privacyData = {
+        en: {
+            headerTitle: "Privacy Policy",
+            mainTitle: "Privacy Policy",
+            subtitle: "NHN LIVE • Last updated: September 2026",
+            cards: [
+                { id: "1", title: "Introduction", body: "We respect your privacy and are committed to protecting it. This policy clarifies how data is handled when you use NHN LIVE." },
+                { id: "2", title: "Data We Process", body: "The app requires no registration and does not collect names, phone numbers, or emails. Minimal anonymous technical diagnostics may be processed to optimize streaming." },
+                { id: "3", title: "Permissions Required", body: "• Internet: Necessary for stream playback.\n• Notifications: Optional for match kick-off alerts.\n• Storage: For saving optional downloads." },
+                { id: "4", title: "Data Utilization", body: "To deliver and optimize application performance. We never sell, rent, or trade your data with external third parties." },
+                { id: "5", title: "Third-Party Feeds", body: "The app may display media feeds from external public sources which operate under their own independent privacy terms." },
+                { id: "6", title: "Intellectual Property", body: "NHN LIVE operates solely as a media display tool and does not claim ownership of external broadcasts. All trademarks belong to their respective owners." },
+                { id: "7", title: "Data Security", body: "We implement standard technical measures to maintain connection integrity and protect local preference configurations." },
+                { id: "8", title: "Children's Privacy", body: "The application is not directed at children under the age of 13, and no personal data is knowingly solicited." },
+                { id: "9", title: "Your Controls", body: "You can clear cached data anytime via browser settings or app storage." },
+                { id: "10", title: "Policy Updates", body: "Any updates to this policy are reflected here immediately. Continued usage represents agreement to updated terms." }
+            ]
+        },
+        ar: {
+            headerTitle: "سياسة الخصوصية",
+            mainTitle: "سياسة الخصوصية",
+            subtitle: "NHN LIVE • آخر تحديث: سبتمبر 2026",
+            cards: [
+                { id: "1", title: "مقدّمة", body: "نحترم خصوصيتك ونلتزم بحمايتها. توضّح هذه السياسة البيانات التي نتعامل معها عند استخدامك لتطبيق NHN LIVE، وكيف نستخدمها وحقوقك تجاهها." },
+                { id: "2", title: "البيانات التي نجمعها", body: "لا يطلب التطبيق التسجيل ولا يجمع أسماء أو أرقام هواتف أو بريداً إلكترونياً. تُعالج بيانات تقنية مجهولة الهوية لتحسين استقرار البث." },
+                { id: "3", title: "الأذونات المطلوبة", body: "• الإنترنت: ضروري لتحميل المحتوى وتشغيل البث.\n• الإشعارات: اختياري لإعلامك بالمباريات والتحديثات.\n• التخزين: لحفظ الملفات التي تختار تنزيلها بنفسك." },
+                { id: "4", title: "كيف نستخدم البيانات", body: "لتشغيل التطبيق وتحسين السرعة وإصلاح الأعطال. لا نبيع بياناتك ولا نشاركها لأغراض تسويقية." },
+                { id: "5", title: "الخدمات والمحتوى الخارجي", body: "يعرض التطبيق مصادر بث عامة ومفتوحة تخضع لسياسات الخصوصية الخاصة بمزوديها الأصليين." },
+                { id: "6", title: "حقوق الملكية والمحتوى", body: "يعمل التطبيق كواجهة عرض ولا يدّعي ملكية المحتوى التابع لأطراف أخرى. جميع الحقوق محفوظة لمالكيها الأصليين." },
+                { id: "7", title: "أمان البيانات", body: "نستخدم اتصالات مشفرة وإجراءات تقنية مناسبة لحماية استقرار التطبيق وتفضيلات المستخدم." },
+                { id: "8", title: "خصوصية الأطفال", body: "التطبيق غير موجّه للأطفال دون سن 13 عاماً، ولا نجمع بياناتهم الشخصية عن قصد." },
+                { id: "9", title: "حقوقك والتحكم", body: "يمكنك مسح البيانات المحلية في أي وقت عبر إعدادات المتصفح." },
+                { id: "10", title: "تعديلات السياسة", body: "قد نحدّث هذه السياسة دورياً ويظهر تاريخ التحديث أعلى الصفحة ويُعد استمرارك موافقة عليها." }
+            ]
+        }
+    };
+
+    // قاموس ترجمة باقي الواجهة
     const i18n = {
         en: {
             dir: "ltr",
@@ -51,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             invalidCode: "Invalid activation code!",
             fillAllFields: "Please fill in all server fields!",
             clipboardEmpty: "Clipboard is empty or access denied.",
-            pasted: "Pasted!"
+            shareMessage: "⚽ Download NHN LIVE app now for live match schedules and streaming in top quality!\n📥 Direct Download:\n" + APP_DOWNLOAD_URL
         },
         ar: {
             dir: "rtl",
@@ -97,11 +139,22 @@ document.addEventListener("DOMContentLoaded", () => {
             invalidCode: "رمز التفعيل غير صحيح!",
             fillAllFields: "يرجى ملء جميع حقول السيرفر!",
             clipboardEmpty: "الحافظة فارغة أو تم رفض الإذن.",
-            pasted: "تم اللصق!"
+            shareMessage: "⚽ حمّل الآن تطبيق NHN LIVE لمتابعة المباريات وجداول البث المباشر بأعلى جودة!\n📥 رابط التحميل المباشر:\n" + APP_DOWNLOAD_URL
         }
     };
 
-    // عناصر الصفحة
+    // عناصر الواجهة
+    const btnMenu = document.getElementById("btnMenu");
+    const floatingSideMenu = document.getElementById("floatingSideMenu");
+    const btnSidePrivacy = document.getElementById("btnSidePrivacy");
+    const btnSideTelegram = document.getElementById("btnSideTelegram");
+    const btnSideWhatsapp = document.getElementById("btnSideWhatsapp");
+    const btnSideShare = document.getElementById("btnSideShare");
+
+    const privacyModal = document.getElementById("privacyModal");
+    const btnClosePrivacy = document.getElementById("btnClosePrivacy");
+    const privacyCardsContainer = document.getElementById("privacyCardsContainer");
+
     const headerMainTitle = document.getElementById("headerMainTitle");
     const headerSubtitle = document.getElementById("headerSubtitle");
     const cardTopTitle = document.getElementById("cardTopTitle");
@@ -141,15 +194,106 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnChooseArabic = document.getElementById("btnChooseArabic");
     const btnChooseEnglish = document.getElementById("btnChooseEnglish");
 
-    // وظيفة فتح السيرفر الخاص بالمباريات عند إدخال الكود 7777
+    // ==========================================
+    // القائمة الجانبية العائمة
+    // ==========================================
+    btnMenu.addEventListener("click", (e) => {
+        e.stopPropagation();
+        floatingSideMenu.style.display = (floatingSideMenu.style.display === "none") ? "flex" : "none";
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!floatingSideMenu.contains(e.target) && e.target !== btnMenu) {
+            floatingSideMenu.style.display = "none";
+        }
+    });
+
+    // 1. فتح نافذة سياسة الخصوصية
+    btnSidePrivacy.addEventListener("click", () => {
+        floatingSideMenu.style.display = "none";
+        renderPrivacyPolicy();
+        privacyModal.style.display = "flex";
+    });
+
+    btnClosePrivacy.addEventListener("click", () => {
+        privacyModal.style.display = "none";
+    });
+
+    // 2. الانتقال إلى قناة التيليجرام
+    btnSideTelegram.addEventListener("click", () => {
+        floatingSideMenu.style.display = "none";
+        window.open(TELEGRAM_CHANNEL_URL, "_blank");
+    });
+
+    // 3. المشاركة عبر واتساب
+    btnSideWhatsapp.addEventListener("click", () => {
+        floatingSideMenu.style.display = "none";
+        const msg = i18n[isArabic ? "ar" : "en"].shareMessage;
+        const whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(msg);
+        window.open(whatsappUrl, "_blank");
+    });
+
+    // 4. ميزة المشاركة الشاملة (Share)
+    btnSideShare.addEventListener("click", async () => {
+        floatingSideMenu.style.display = "none";
+        const msg = i18n[isArabic ? "ar" : "en"].shareMessage;
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: "NHN LIVE",
+                    text: msg,
+                    url: APP_DOWNLOAD_URL
+                });
+            } catch (err) {}
+        } else {
+            // بديل عند عدم دعم المتصفح لميزة المشاركة (نسخ الرابط)
+            try {
+                await navigator.clipboard.writeText(msg);
+                alert(isArabic ? "تم نسخ رابط التحميل إلى الحافظة بنجاح!" : "Download link copied to clipboard!");
+            } catch (e) {
+                window.open(APP_DOWNLOAD_URL, "_blank");
+            }
+        }
+    });
+
+    // ==========================================
+    // رسم وعرض بنود سياسة الخصوصية العشرة
+    // ==========================================
+    function renderPrivacyPolicy() {
+        const langKey = isArabic ? "ar" : "en";
+        const p = privacyData[langKey];
+
+        document.getElementById("txtPrivacyHeaderTitle").textContent = p.headerTitle;
+        document.getElementById("txtPrivacyMainTitle").textContent = p.mainTitle;
+        document.getElementById("txtPrivacySubtitle").textContent = p.subtitle;
+
+        privacyCardsContainer.innerHTML = "";
+
+        p.cards.forEach(card => {
+            const cardEl = document.createElement("div");
+            cardEl.className = "privacy-item-card";
+
+            cardEl.innerHTML = `
+                <div class="privacy-card-top">
+                    <span class="privacy-card-title">${card.title}</span>
+                    <div class="privacy-card-badge">${card.id}</div>
+                </div>
+                <div class="privacy-card-body">${card.body}</div>
+            `;
+
+            privacyCardsContainer.appendChild(cardEl);
+        });
+    }
+
+    // ==========================================
+    // منطق التفعيل وإدخال الأكواد
+    // ==========================================
     function unlockApp() {
         localStorage.setItem("NHN_LIVE_LOGGED_IN", "true");
         alert(isArabic ? "✅ تم تفعيل الكود بنجاح! يتم الانتقال إلى جدول المباريات..." : "✅ Activation Successful! Redirecting to Matches...");
-        // هنا سنربط الانتقال إلى صفحة المباريات عند تصميمها بالخطوة التالية
         console.log("APP UNLOCKED WITH SECRET CODE: " + SECRET_CODE);
     }
 
-    // فحص الرابط أو كود 7777 في الخانات المباشرة
     function handlePlayStream(inputVal) {
         const val = inputVal.trim();
         if (val === SECRET_CODE) {
@@ -159,13 +303,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (val.startsWith("http://") || val.startsWith("https://")) {
             alert((isArabic ? "جاري تشغيل الرابط: " : "Playing URL: ") + val);
-            // فتح المشغل أو تشغيل الفيديو
         } else {
             alert(i18n[isArabic ? "ar" : "en"].invalidCodeOrUrl);
         }
     }
 
-    // تبديل التبويبات الأربعة
     function switchTab(index) {
         selectedTab = index;
         allTabs.forEach((tab, i) => {
@@ -208,7 +350,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // تطبيق اللغة وتحديث كامل النصوص
     function applyLanguage(arabic) {
         isArabic = arabic;
         localStorage.setItem("NHN_LIVE_LANG", isArabic ? "ar" : "en");
@@ -241,20 +382,20 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("txtModalTitle").textContent = t.modalTitle;
 
         switchTab(selectedTab);
+        if (privacyModal.style.display === "flex") {
+            renderPrivacyPolicy();
+        }
     }
 
-    // أحداث الضغط على التبويبات
     tabDirect.addEventListener("click", () => switchTab(0));
     tabWeb.addEventListener("click", () => switchTab(1));
     tabM3u.addEventListener("click", () => switchTab(2));
     tabXtream.addEventListener("click", () => switchTab(3));
 
-    // زر تشغيل الرابط (Direct / Web / M3U)
     btnPlayNow.addEventListener("click", () => {
         handlePlayStream(etStreamUrl.value);
     });
 
-    // تنقلات قائمة Xtream
     rowNhnCodeOption.addEventListener("click", () => {
         sectionXtreamMenu.style.display = "none";
         sectionNhnCodeInput.style.display = "block";
@@ -273,7 +414,6 @@ document.addEventListener("DOMContentLoaded", () => {
         sectionXtreamMenu.style.display = "block";
     });
 
-    // زر تفعيل NHN Code بكود 7777
     btnConnectNhnCode.addEventListener("click", () => {
         const code = etNhnCode.value.trim();
         if (code === SECRET_CODE) {
@@ -289,7 +429,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tvXtreamError.style.display = "none";
     });
 
-    // تسجيل وفحص حساب Xtream حقيقي
     btnSaveAndConnect.addEventListener("click", async () => {
         let server = etXtreamServer.value.trim();
         const user = etXtreamUser.value.trim();
@@ -328,7 +467,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ميزة اللصق التلقائي من الحافظة
     document.querySelectorAll(".paste-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
             const targetId = btn.getAttribute("data-target");
@@ -346,7 +484,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // نافذة اختيار اللغة
     btnLanguage.addEventListener("click", () => {
         languageModal.style.display = "flex";
     });
@@ -365,7 +502,6 @@ document.addEventListener("DOMContentLoaded", () => {
         languageModal.style.display = "none";
     });
 
-    // التعرف التلقائي على لغة الجهاز عند أول دخول
     const savedLang = localStorage.getItem("NHN_LIVE_LANG");
     if (savedLang) {
         applyLanguage(savedLang === "ar");
