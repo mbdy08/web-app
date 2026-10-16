@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. حماية الصفحة: التأكد من تفعيل كود 7777
+    // 1. حماية صفحة المباريات: لا تفتح إلا لمن يملك تفعيل 7777
     if (localStorage.getItem("NHN_LIVE_LOGGED_IN") !== "true") {
         window.location.href = "index.html";
         return;
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const noMatchesBox = document.getElementById("noMatchesBox");
     const btnTopTelegram = document.getElementById("btnTopTelegram");
 
-    // عناصر المشغل
+    // المشغل المدمج
     const playerOverlayModal = document.getElementById("playerOverlayModal");
     const btnClosePlayer = document.getElementById("btnClosePlayer");
     const hlsVideoPlayer = document.getElementById("hlsVideoPlayer");
@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnQual4k = document.getElementById("btnQual4k");
     const playerBuffering = document.getElementById("playerBuffering");
 
-    // عناصر الشاشات الكاملة
+    // الشاشات الكاملة
     const fullInfoOverlay = document.getElementById("fullInfoOverlay");
     const btnCloseFullInfo = document.getElementById("btnCloseFullInfo");
     const txtInfoNavTitle = document.getElementById("txtInfoNavTitle");
@@ -193,18 +193,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const txtInfoHeroSubtitle = document.getElementById("txtInfoHeroSubtitle");
     const infoCardsList = document.getElementById("infoCardsList");
 
-    // عناصر نافذة التواصل
+    // نافذة التواصل
     const contactModalDialog = document.getElementById("contactModalDialog");
     const btnContactTelegram = document.getElementById("btnContactTelegram");
     const btnContactEmail = document.getElementById("btnContactEmail");
 
-    // ==========================================
-    // 1. جلب المباريات من السحابة (GitHub JSON)
-    // ==========================================
+    // جلب المباريات من السحابة
     async function fetchMatches() {
-        loadingMatches.style.display = "block";
-        matchesListContainer.innerHTML = "";
-        noMatchesBox.style.display = "none";
+        if (loadingMatches) loadingMatches.style.display = "block";
+        if (matchesListContainer) matchesListContainer.innerHTML = "";
+        if (noMatchesBox) noMatchesBox.style.display = "none";
 
         try {
             const res = await fetch(`${MATCHES_URL}?t=${Date.now()}`);
@@ -222,8 +220,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 allMatches = normalizeMatchesData(data);
                 filterMatchesByDay(currentDayTab);
             } catch (err) {
-                loadingMatches.style.display = "none";
-                noMatchesBox.style.display = "block";
+                if (loadingMatches) loadingMatches.style.display = "none";
+                if (noMatchesBox) noMatchesBox.style.display = "block";
             }
         }
     }
@@ -256,90 +254,87 @@ document.addEventListener("DOMContentLoaded", () => {
         return "https://raw.githubusercontent.com/mbdy08/matches/main/" + url.replace(/^\/+/, "");
     }
 
-    // ==========================================
-    // 2. تصفية وعرض المباريات
-    // ==========================================
+    // تصفية وعرض المباريات
     function filterMatchesByDay(day) {
         currentDayTab = day;
         allDayTabs.forEach(tab => {
-            tab.classList.toggle("active", tab.getAttribute("data-day") === day);
+            if (tab) tab.classList.toggle("active", tab.getAttribute("data-day") === day);
         });
 
-        loadingMatches.style.display = "none";
+        if (loadingMatches) loadingMatches.style.display = "none";
         const filtered = allMatches.filter(m => m.day === day);
 
         if (filtered.length === 0) {
-            matchesListContainer.innerHTML = "";
-            noMatchesBox.style.display = "block";
+            if (matchesListContainer) matchesListContainer.innerHTML = "";
+            if (noMatchesBox) noMatchesBox.style.display = "block";
             return;
         }
 
-        noMatchesBox.style.display = "none";
-        matchesListContainer.innerHTML = "";
+        if (noMatchesBox) noMatchesBox.style.display = "none";
+        if (matchesListContainer) {
+            matchesListContainer.innerHTML = "";
+            filtered.forEach(match => {
+                const card = document.createElement("div");
+                card.className = "match-card";
 
-        filtered.forEach(match => {
-            const card = document.createElement("div");
-            card.className = "match-card";
+                const isLive = match.status.includes("مباشر") || match.status.toLowerCase().includes("live");
+                const statusClass = isLive ? "status-val live" : "status-val";
 
-            const isLive = match.status.includes("مباشر") || match.status.toLowerCase().includes("live");
-            const statusClass = isLive ? "status-val live" : "status-val";
-
-            card.innerHTML = `
-                <div class="match-league-header">
-                    ${match.leagueLogo ? `<img src="${match.leagueLogo}" class="league-crest" alt="league" onerror="this.style.display='none'">` : ""}
-                    <span class="league-name">${match.league}</span>
-                </div>
-
-                <div class="match-teams-row">
-                    <div class="team-box">
-                        <img src="${match.homeLogo}" class="team-logo" alt="${match.homeTeam}" onerror="this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png'">
-                        <span class="team-name">${match.homeTeam}</span>
+                card.innerHTML = `
+                    <div class="match-league-header">
+                        ${match.leagueLogo ? `<img src="${match.leagueLogo}" class="league-crest" alt="league" onerror="this.style.display='none'">` : ""}
+                        <span class="league-name">${match.league}</span>
                     </div>
 
-                    <div class="match-time-box">
-                        <span class="time-val">${match.time || "00:00"}</span>
-                        <span class="${statusClass}">${match.status || (isArabic ? "لم يبدأ بعد" : "Not Started")}</span>
+                    <div class="match-teams-row">
+                        <div class="team-box">
+                            <img src="${match.homeLogo}" class="team-logo" alt="${match.homeTeam}" onerror="this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png'">
+                            <span class="team-name">${match.homeTeam}</span>
+                        </div>
+
+                        <div class="match-time-box">
+                            <span class="time-val">${match.time || "00:00"}</span>
+                            <span class="${statusClass}">${match.status || (isArabic ? "لم يبدأ بعد" : "Not Started")}</span>
+                        </div>
+
+                        <div class="team-box">
+                            <img src="${match.awayLogo}" class="team-logo" alt="${match.awayTeam}" onerror="this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png'">
+                            <span class="team-name">${match.awayTeam}</span>
+                        </div>
                     </div>
 
-                    <div class="team-box">
-                        <img src="${match.awayLogo}" class="team-logo" alt="${match.awayTeam}" onerror="this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png'">
-                        <span class="team-name">${match.awayTeam}</span>
-                    </div>
-                </div>
+                    <button class="btn-watch-match" data-hd="${match.streamHd}" data-sd="${match.streamSd}" data-4k="${match.stream4k}" data-viewers="${match.viewers}">
+                        <span>${i18n[isArabic ? "ar" : "en"].watchNow}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </button>
+                `;
 
-                <button class="btn-watch-match" data-hd="${match.streamHd}" data-sd="${match.streamSd}" data-4k="${match.stream4k}" data-viewers="${match.viewers}">
-                    <span>${i18n[isArabic ? "ar" : "en"].watchNow}</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                </button>
-            `;
+                card.querySelector(".btn-watch-match").addEventListener("click", function() {
+                    const streams = {
+                        HD: this.getAttribute("data-hd"),
+                        SD: this.getAttribute("data-sd"),
+                        "4K": this.getAttribute("data-4k")
+                    };
+                    const vCount = this.getAttribute("data-viewers");
+                    openLivePlayer(streams, vCount);
+                });
 
-            card.querySelector(".btn-watch-match").addEventListener("click", function() {
-                const streams = {
-                    HD: this.getAttribute("data-hd"),
-                    SD: this.getAttribute("data-sd"),
-                    "4K": this.getAttribute("data-4k")
-                };
-                const vCount = this.getAttribute("data-viewers");
-                openLivePlayer(streams, vCount);
+                matchesListContainer.appendChild(card);
             });
-
-            matchesListContainer.appendChild(card);
-        });
+        }
     }
 
-    tabYesterday.addEventListener("click", () => filterMatchesByDay("yesterday"));
-    tabToday.addEventListener("click", () => filterMatchesByDay("today"));
-    tabTomorrow.addEventListener("click", () => filterMatchesByDay("tomorrow"));
+    if (tabYesterday) tabYesterday.addEventListener("click", () => filterMatchesByDay("yesterday"));
+    if (tabToday) tabToday.addEventListener("click", () => filterMatchesByDay("today"));
+    if (tabTomorrow) tabTomorrow.addEventListener("click", () => filterMatchesByDay("tomorrow"));
 
-    // ==========================================
-    // 3. مشغل الفيديو المدمج (HD / SD / 4K)
-    // ==========================================
+    // مشغل الفيديو
     function openLivePlayer(streams, viewers) {
         currentStreams = streams;
-        txtViewersCount.textContent = viewers || "16.8K";
+        if (txtViewersCount) txtViewersCount.textContent = viewers || "16.8K";
         currentActiveQuality = streams.HD ? "HD" : (streams.SD ? "SD" : "4K");
 
-        playerOverlayModal.style.display = "flex";
+        if (playerOverlayModal) playerOverlayModal.style.display = "flex";
         updateQualityButtonsUI();
         playStreamUrl(currentStreams[currentActiveQuality]);
     }
@@ -350,24 +345,24 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        playerBuffering.style.display = "block";
+        if (playerBuffering) playerBuffering.style.display = "block";
 
-        if (Hls.isSupported() && (url.includes(".m3u8") || url.includes(".ts") || !url.includes(".mp4"))) {
+        if (window.Hls && Hls.isSupported() && (url.includes(".m3u8") || url.includes(".ts") || !url.includes(".mp4"))) {
             if (hlsInstance) hlsInstance.destroy();
             hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
             hlsInstance.loadSource(url);
             hlsInstance.attachMedia(hlsVideoPlayer);
             hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-                playerBuffering.style.display = "none";
+                if (playerBuffering) playerBuffering.style.display = "none";
                 hlsVideoPlayer.play().catch(() => {});
             });
             hlsInstance.on(Hls.Events.ERROR, () => {
-                playerBuffering.style.display = "none";
+                if (playerBuffering) playerBuffering.style.display = "none";
             });
-        } else {
+        } else if (hlsVideoPlayer) {
             hlsVideoPlayer.src = url;
             hlsVideoPlayer.addEventListener("loadedmetadata", () => {
-                playerBuffering.style.display = "none";
+                if (playerBuffering) playerBuffering.style.display = "none";
                 hlsVideoPlayer.play().catch(() => {});
             });
         }
@@ -384,98 +379,116 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     function updateQualityButtonsUI() {
-        btnQualHd.classList.toggle("active", currentActiveQuality === "HD");
-        btnQualSd.classList.toggle("active", currentActiveQuality === "SD");
-        btnQual4k.classList.toggle("active", currentActiveQuality === "4K");
+        if (btnQualHd) btnQualHd.classList.toggle("active", currentActiveQuality === "HD");
+        if (btnQualSd) btnQualSd.classList.toggle("active", currentActiveQuality === "SD");
+        if (btnQual4k) btnQual4k.classList.toggle("active", currentActiveQuality === "4K");
     }
 
-    btnClosePlayer.addEventListener("click", () => {
-        playerOverlayModal.style.display = "none";
-        if (hlsInstance) {
-            hlsInstance.destroy();
-            hlsInstance = null;
-        }
-        hlsVideoPlayer.pause();
-        hlsVideoPlayer.src = "";
-    });
+    if (btnClosePlayer) {
+        btnClosePlayer.addEventListener("click", () => {
+            if (playerOverlayModal) playerOverlayModal.style.display = "none";
+            if (hlsInstance) {
+                hlsInstance.destroy();
+                hlsInstance = null;
+            }
+            if (hlsVideoPlayer) {
+                hlsVideoPlayer.pause();
+                hlsVideoPlayer.src = "";
+            }
+        });
+    }
 
-    // ==========================================
-    // 4. شريط التنقل السفلي
-    // ==========================================
-    btnNavMatches.addEventListener("click", () => {
-        sectionSettings.style.display = "none";
-        sectionMatches.style.display = "block";
-        btnNavMatches.classList.add("active");
-        btnNavSettings.classList.remove("active");
-    });
+    // التنقل السفلي
+    if (btnNavMatches) {
+        btnNavMatches.addEventListener("click", () => {
+            if (sectionSettings) sectionSettings.style.display = "none";
+            if (sectionMatches) sectionMatches.style.display = "block";
+            btnNavMatches.classList.add("active");
+            if (btnNavSettings) btnNavSettings.classList.remove("active");
+        });
+    }
 
-    btnNavSettings.addEventListener("click", () => {
-        sectionMatches.style.display = "none";
-        sectionSettings.style.display = "block";
-        btnNavSettings.classList.add("active");
-        btnNavMatches.classList.remove("active");
-    });
+    if (btnNavSettings) {
+        btnNavSettings.addEventListener("click", () => {
+            if (sectionMatches) sectionMatches.style.display = "none";
+            if (sectionSettings) sectionSettings.style.display = "block";
+            btnNavSettings.classList.add("active");
+            if (btnNavMatches) btnNavMatches.classList.remove("active");
+        });
+    }
 
-    // ==========================================
-    // 5. عرض الشاشات الكاملة (About / Terms / Privacy)
-    // ==========================================
+    // عرض الشاشات الكاملة
     function openDetailedSection(key) {
         const langKey = isArabic ? "ar" : "en";
         const data = detailedInfoData[key][langKey];
 
-        txtInfoNavTitle.textContent = data.nav;
-        txtInfoHeroTitle.textContent = data.hero;
-        txtInfoHeroSubtitle.textContent = data.sub;
+        if (txtInfoNavTitle) txtInfoNavTitle.textContent = data.nav;
+        if (txtInfoHeroTitle) txtInfoHeroTitle.textContent = data.hero;
+        if (txtInfoHeroSubtitle) txtInfoHeroSubtitle.textContent = data.sub;
 
-        infoCardsList.innerHTML = "";
-        data.cards.forEach(card => {
-            const cardEl = document.createElement("div");
-            cardEl.className = "info-card-item";
-            cardEl.innerHTML = `
-                <div class="info-card-head">
-                    <span class="info-card-title">${card.title}</span>
-                    <div class="info-card-badge">${card.id}</div>
-                </div>
-                <div class="info-card-body">${card.body}</div>
-            `;
-            infoCardsList.appendChild(cardEl);
-        });
+        if (infoCardsList) {
+            infoCardsList.innerHTML = "";
+            data.cards.forEach(card => {
+                const cardEl = document.createElement("div");
+                cardEl.className = "info-card-item";
+                cardEl.innerHTML = `
+                    <div class="info-card-head">
+                        <span class="info-card-title">${card.title}</span>
+                        <div class="info-card-badge">${card.id}</div>
+                    </div>
+                    <div class="info-card-body">${card.body}</div>
+                `;
+                infoCardsList.appendChild(cardEl);
+            });
+        }
 
-        fullInfoOverlay.style.display = "flex";
+        if (fullInfoOverlay) fullInfoOverlay.style.display = "flex";
     }
 
-    btnCloseFullInfo.addEventListener("click", () => {
-        fullInfoOverlay.style.display = "none";
-    });
+    if (btnCloseFullInfo) {
+        btnCloseFullInfo.addEventListener("click", () => {
+            if (fullInfoOverlay) fullInfoOverlay.style.display = "none";
+        });
+    }
 
-    document.getElementById("rowAboutUs").addEventListener("click", () => openDetailedSection("about"));
-    document.getElementById("rowPrivacyPolicy").addEventListener("click", () => openDetailedSection("privacy"));
-    document.getElementById("rowTerms").addEventListener("click", () => openDetailedSection("terms"));
+    const rowAbout = document.getElementById("rowAboutUs");
+    if (rowAbout) rowAbout.addEventListener("click", () => openDetailedSection("about"));
 
-    // ==========================================
-    // 6. نافذة Contact Support & Ads المنبثقة
-    // ==========================================
-    document.getElementById("rowContact").addEventListener("click", () => {
-        contactModalDialog.style.display = "flex";
-    });
+    const rowPrivacy = document.getElementById("rowPrivacyPolicy");
+    if (rowPrivacy) rowPrivacy.addEventListener("click", () => openDetailedSection("privacy"));
 
-    contactModalDialog.addEventListener("click", (e) => {
-        if (e.target === contactModalDialog) contactModalDialog.style.display = "none";
-    });
+    const rowTerms = document.getElementById("rowTerms");
+    if (rowTerms) rowTerms.addEventListener("click", () => openDetailedSection("terms"));
 
-    btnContactTelegram.addEventListener("click", () => {
-        contactModalDialog.style.display = "none";
-        window.open(TELEGRAM_SUPPORT_URL, "_blank");
-    });
+    // نافذة التواصل
+    const rowContact = document.getElementById("rowContact");
+    if (rowContact) {
+        rowContact.addEventListener("click", () => {
+            if (contactModalDialog) contactModalDialog.style.display = "flex";
+        });
+    }
 
-    btnContactEmail.addEventListener("click", () => {
-        contactModalDialog.style.display = "none";
-        window.location.href = "mailto:admin@nhnlive.com";
-    });
+    if (contactModalDialog) {
+        contactModalDialog.addEventListener("click", (e) => {
+            if (e.target === contactModalDialog) contactModalDialog.style.display = "none";
+        });
+    }
 
-    // ==========================================
-    // 7. تطبيق اللغات والمظهر
-    // ==========================================
+    if (btnContactTelegram) {
+        btnContactTelegram.addEventListener("click", () => {
+            if (contactModalDialog) contactModalDialog.style.display = "none";
+            window.open(TELEGRAM_SUPPORT_URL, "_blank");
+        });
+    }
+
+    if (btnContactEmail) {
+        btnContactEmail.addEventListener("click", () => {
+            if (contactModalDialog) contactModalDialog.style.display = "none";
+            window.location.href = "mailto:admin@nhnlive.com";
+        });
+    }
+
+    // تبديل اللغات والمظهر
     const btnSettingLangEn = document.getElementById("btnSettingLangEn");
     const btnSettingLangAr = document.getElementById("btnSettingLangAr");
     const btnSettingThemeDark = document.getElementById("btnSettingThemeDark");
@@ -489,70 +502,94 @@ document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.lang = isArabic ? "ar" : "en";
         document.documentElement.dir = t.dir;
 
-        btnSettingLangAr.classList.toggle("active", isArabic);
-        btnSettingLangEn.classList.toggle("active", !isArabic);
+        if (btnSettingLangAr) btnSettingLangAr.classList.toggle("active", isArabic);
+        if (btnSettingLangEn) btnSettingLangEn.classList.toggle("active", !isArabic);
 
-        tabYesterday.textContent = t.yesterday;
-        tabToday.textContent = t.today;
-        tabTomorrow.textContent = t.tomorrow;
-        document.getElementById("txtLoading").textContent = t.loading;
-        document.getElementById("txtNoMatches").textContent = t.noMatches;
+        if (tabYesterday) tabYesterday.textContent = t.yesterday;
+        if (tabToday) tabToday.textContent = t.today;
+        if (tabTomorrow) tabTomorrow.textContent = t.tomorrow;
+        const txtLoading = document.getElementById("txtLoading");
+        if (txtLoading) txtLoading.textContent = t.loading;
+        const txtNoMatches = document.getElementById("txtNoMatches");
+        if (txtNoMatches) txtNoMatches.textContent = t.noMatches;
 
-        document.getElementById("txtNavMatches").textContent = t.matchesNav;
-        document.getElementById("txtNavSettings").textContent = t.settingsNav;
-        document.getElementById("txtSettingsMainTitle").textContent = t.settingsTitle;
-        document.getElementById("txtHeaderGeneral").textContent = t.generalHeader;
-        document.getElementById("txtLabelLanguage").textContent = t.langLabel;
-        document.getElementById("txtLabelTheme").textContent = t.themeLabel;
+        const txtNavMatches = document.getElementById("txtNavMatches");
+        if (txtNavMatches) txtNavMatches.textContent = t.matchesNav;
+        const txtNavSettings = document.getElementById("txtNavSettings");
+        if (txtNavSettings) txtNavSettings.textContent = t.settingsNav;
+        const txtSettingsMainTitle = document.getElementById("txtSettingsMainTitle");
+        if (txtSettingsMainTitle) txtSettingsMainTitle.textContent = t.settingsTitle;
+        const txtHeaderGeneral = document.getElementById("txtHeaderGeneral");
+        if (txtHeaderGeneral) txtHeaderGeneral.textContent = t.generalHeader;
+        const txtLabelLanguage = document.getElementById("txtLabelLanguage");
+        if (txtLabelLanguage) txtLabelLanguage.textContent = t.langLabel;
+        const txtLabelTheme = document.getElementById("txtLabelTheme");
+        if (txtLabelTheme) txtLabelTheme.textContent = t.themeLabel;
 
-        document.getElementById("txtHeaderApp").textContent = t.appHeader;
-        document.getElementById("txtLabelDownload").textContent = t.downloadApp;
-        document.getElementById("txtLabelShare").textContent = t.shareApp;
-        document.getElementById("txtLabelVersion").textContent = t.appVersion;
+        const txtHeaderApp = document.getElementById("txtHeaderApp");
+        if (txtHeaderApp) txtHeaderApp.textContent = t.appHeader;
+        const txtLabelDownload = document.getElementById("txtLabelDownload");
+        if (txtLabelDownload) txtLabelDownload.textContent = t.downloadApp;
+        const txtLabelShare = document.getElementById("txtLabelShare");
+        if (txtLabelShare) txtLabelShare.textContent = t.shareApp;
+        const txtLabelVersion = document.getElementById("txtLabelVersion");
+        if (txtLabelVersion) txtLabelVersion.textContent = t.appVersion;
 
-        document.getElementById("txtHeaderInfo").textContent = t.infoHeader;
-        document.getElementById("txtLabelAbout").textContent = t.aboutUs;
-        document.getElementById("txtLabelPrivacy").textContent = t.privacyPolicy;
-        document.getElementById("txtLabelTerms").textContent = t.terms;
-        document.getElementById("txtLabelContact").textContent = t.contact;
+        const txtHeaderInfo = document.getElementById("txtHeaderInfo");
+        if (txtHeaderInfo) txtHeaderInfo.textContent = t.infoHeader;
+        const txtLabelAbout = document.getElementById("txtLabelAbout");
+        if (txtLabelAbout) txtLabelAbout.textContent = t.aboutUs;
+        const txtLabelPrivacy = document.getElementById("txtLabelPrivacy");
+        if (txtLabelPrivacy) txtLabelPrivacy.textContent = t.privacyPolicy;
+        const txtLabelTerms = document.getElementById("txtLabelTerms");
+        if (txtLabelTerms) txtLabelTerms.textContent = t.terms;
+        const txtLabelContact = document.getElementById("txtLabelContact");
+        if (txtLabelContact) txtLabelContact.textContent = t.contact;
 
         filterMatchesByDay(currentDayTab);
     }
 
-    btnSettingLangEn.addEventListener("click", () => applyLanguage(false));
-    btnSettingLangAr.addEventListener("click", () => applyLanguage(true));
+    if (btnSettingLangEn) btnSettingLangEn.addEventListener("click", () => applyLanguage(false));
+    if (btnSettingLangAr) btnSettingLangAr.addEventListener("click", () => applyLanguage(true));
 
     function applyTheme(dark) {
         isDarkMode = dark;
         localStorage.setItem("NHN_LIVE_THEME", dark ? "dark" : "light");
         document.body.className = dark ? "dark-theme" : "light-theme";
-        btnSettingThemeDark.classList.toggle("active", dark);
-        btnSettingThemeLight.classList.toggle("active", !dark);
+        if (btnSettingThemeDark) btnSettingThemeDark.classList.toggle("active", dark);
+        if (btnSettingThemeLight) btnSettingThemeLight.classList.toggle("active", !dark);
     }
 
-    btnSettingThemeDark.addEventListener("click", () => applyTheme(true));
-    btnSettingThemeLight.addEventListener("click", () => applyTheme(false));
+    if (btnSettingThemeDark) btnSettingThemeDark.addEventListener("click", () => applyTheme(true));
+    if (btnSettingThemeLight) btnSettingThemeLight.addEventListener("click", () => applyTheme(false));
 
-    // مشاركة التطبيق
-    document.getElementById("rowShareApp").addEventListener("click", async () => {
-        const msg = i18n[isArabic ? "ar" : "en"].shareMessage;
-        if (navigator.share) {
-            try {
-                await navigator.share({ title: "NHN LIVE", text: msg, url: APP_DOWNLOAD_URL });
-            } catch (err) {}
-        } else {
-            navigator.clipboard.writeText(msg);
-            alert(isArabic ? "تم نسخ رابط التحميل" : "Download link copied");
-        }
-    });
+    const rowShare = document.getElementById("rowShareApp");
+    if (rowShare) {
+        rowShare.addEventListener("click", async () => {
+            const msg = i18n[isArabic ? "ar" : "en"].shareMessage;
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: "NHN LIVE", text: msg, url: APP_DOWNLOAD_URL });
+                } catch (err) {}
+            } else {
+                navigator.clipboard.writeText(msg);
+                alert(isArabic ? "تم نسخ رابط التحميل" : "Download link copied");
+            }
+        });
+    }
 
-    document.getElementById("rowDownloadApp").addEventListener("click", () => {
-        window.open(APP_DOWNLOAD_URL, "_blank");
-    });
+    const rowDownload = document.getElementById("rowDownloadApp");
+    if (rowDownload) {
+        rowDownload.addEventListener("click", () => {
+            window.open(APP_DOWNLOAD_URL, "_blank");
+        });
+    }
 
-    btnTopTelegram.addEventListener("click", () => {
-        window.open(TELEGRAM_URL, "_blank");
-    });
+    if (btnTopTelegram) {
+        btnTopTelegram.addEventListener("click", () => {
+            window.open(TELEGRAM_URL, "_blank");
+        });
+    }
 
     // استعادة الإعدادات المحفوظة
     const savedLang = localStorage.getItem("NHN_LIVE_LANG");
