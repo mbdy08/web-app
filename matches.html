@@ -34,39 +34,32 @@
         <!-- 1. قسم المباريات (Matches Tab)                 -->
         <!-- ============================================== -->
         <main id="sectionMatches" class="main-tab-content">
-            <!-- أزرار الأيام: الأمس / اليوم / الغد -->
             <div class="days-tab-bar">
                 <button class="day-tab-btn" data-day="yesterday" id="tabYesterday">Yesterday</button>
                 <button class="day-tab-btn active" data-day="today" id="tabToday">Today</button>
                 <button class="day-tab-btn" data-day="tomorrow" id="tabTomorrow">Tomorrow</button>
             </div>
 
-            <!-- مؤشر التحميل الدوار -->
             <div id="loadingMatches" class="loading-box">
                 <div class="spinner"></div>
                 <p id="txtLoading">Loading matches...</p>
             </div>
 
-            <!-- قائمة المباريات -->
             <div id="matchesListContainer" class="matches-list-container"></div>
 
-            <!-- رسالة عند عدم توفر مباريات -->
             <div id="noMatchesBox" class="no-matches-box" style="display: none;">
                 <p id="txtNoMatches">No matches scheduled</p>
             </div>
         </main>
 
         <!-- ============================================== -->
-        <!-- 2. قسم الإعدادات والمزيد (Settings Tab)        -->
+        <!-- 2. قسم الإعدادات (Settings Tab)                -->
         <!-- ============================================== -->
         <main id="sectionSettings" class="main-tab-content" style="display: none;">
             <h2 id="txtSettingsMainTitle" class="settings-main-title">Settings & More</h2>
 
-            <!-- مجموعة الإعدادات العامة (تم حذف الإشعارات منها) -->
             <div class="settings-group-card">
                 <h4 id="txtHeaderGeneral" class="group-header-label">General Settings</h4>
-
-                <!-- اللغة -->
                 <div class="setting-row">
                     <span id="txtLabelLanguage" class="setting-title">Language</span>
                     <div class="pill-switch-container">
@@ -75,7 +68,6 @@
                     </div>
                 </div>
 
-                <!-- المظهر -->
                 <div class="setting-row">
                     <span id="txtLabelTheme" class="setting-title">Theme</span>
                     <div class="pill-switch-container">
@@ -85,45 +77,36 @@
                 </div>
             </div>
 
-            <!-- مجموعة التطبيق -->
             <div class="settings-group-card">
                 <h4 id="txtHeaderApp" class="group-header-label">Application</h4>
-
                 <div class="setting-clickable-row" id="rowDownloadApp">
                     <span id="txtLabelDownload" class="setting-title">Download App (APK)</span>
                     <span class="setting-arrow">›</span>
                 </div>
-
                 <div class="setting-clickable-row" id="rowShareApp">
                     <span id="txtLabelShare" class="setting-title">Share App with Friends</span>
                     <span class="setting-arrow">›</span>
                 </div>
-
                 <div class="setting-row">
                     <span id="txtLabelVersion" class="setting-title">App Version</span>
                     <span class="version-badge">1.0.0</span>
                 </div>
             </div>
 
-            <!-- مجموعة المعلومات -->
             <div class="settings-group-card">
                 <h4 id="txtHeaderInfo" class="group-header-label">Information</h4>
-
                 <div class="setting-clickable-row" id="rowAboutUs">
                     <span id="txtLabelAbout" class="setting-title">About Us</span>
                     <span class="setting-arrow">›</span>
                 </div>
-
                 <div class="setting-clickable-row" id="rowPrivacyPolicy">
                     <span id="txtLabelPrivacy" class="setting-title">Privacy Policy</span>
                     <span class="setting-arrow">›</span>
                 </div>
-
                 <div class="setting-clickable-row" id="rowTerms">
                     <span id="txtLabelTerms" class="setting-title">Terms of Service</span>
                     <span class="setting-arrow">›</span>
                 </div>
-
                 <div class="setting-clickable-row" id="rowContact">
                     <span id="txtLabelContact" class="setting-title">Contact Support & Ads</span>
                     <span class="setting-arrow">›</span>
@@ -131,9 +114,7 @@
             </div>
         </main>
 
-        <!-- ============================================== -->
-        <!-- شريط التنقل السفلي الثابت                      -->
-        <!-- ============================================== -->
+        <!-- شريط التنقل السفلي الثابت -->
         <nav class="bottom-nav-bar">
             <button id="btnNavMatches" class="nav-tab-btn active">
                 <span class="nav-icon">⚽</span>
@@ -146,42 +127,163 @@
         </nav>
     </div>
 
-    <!-- ============================================== -->
-    <!-- المشغل المدمج المنبثق بجودات (HD / SD / 4K)    -->
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
+    <!-- 3. مشغل الفيديو الاحترافي المتكامل (مطابق للصور 100%)    -->
+    <!-- ======================================================= -->
     <div id="playerOverlayModal" class="player-overlay" style="display: none;">
-        <div class="player-content-box">
-            <div class="player-top-header">
-                <div class="player-quality-group">
-                    <button id="btnQualHd" class="quality-btn active" onclick="switchStreamQuality('HD')">HD</button>
-                    <button id="btnQualSd" class="quality-btn" onclick="switchStreamQuality('SD')">SD</button>
-                    <button id="btnQual4k" class="quality-btn" onclick="switchStreamQuality('4K')">4K</button>
-                </div>
-
-                <div class="player-header-right">
-                    <div class="live-badge-card">
-                        <span>👥</span>
-                        <span id="txtViewersCount">16.8K</span>
-                        <div class="live-dot"></div>
-                        <span class="live-txt">LIVE</span>
-                    </div>
-
-                    <button id="btnClosePlayer" class="btn-close-video" title="Close">✕</button>
-                </div>
+        <div class="player-viewport" id="playerViewport">
+            <!-- شاشة الفيديو الأصلية -->
+            <video id="hlsVideoPlayer" playsinline></video>
+            
+            <!-- طبقة التحميل الدوارة -->
+            <div id="playerBuffering" class="player-buffering" style="display: none;">
+                <div class="spinner"></div>
             </div>
 
-            <div class="video-screen-wrapper">
-                <video id="hlsVideoPlayer" controls playsinline autoplay></video>
-                <div id="playerBuffering" class="player-buffering" style="display: none;">
-                    <div class="spinner"></div>
+            <!-- طبقة واجهة التحكم بالكامل (تختفي وتظهر باللمس) -->
+            <div class="player-ui-layer" id="playerUiLayer">
+                <!-- الشريط العلوي للمشغل -->
+                <div class="player-top-bar">
+                    <!-- كبسولات الجودة: HD ثم SD ثم 4K -->
+                    <div class="player-quality-pills">
+                        <button id="btnQualHd" class="q-pill active" onclick="switchStreamQuality('HD')">HD</button>
+                        <button id="btnQualSd" class="q-pill" onclick="switchStreamQuality('SD')">SD</button>
+                        <button id="btnQual4k" class="q-pill" onclick="switchStreamQuality('4K')">4K</button>
+                    </div>
+
+                    <div class="player-top-right-group">
+                        <!-- شارة المشاهدين المباشرة -->
+                        <div class="live-status-pill">
+                            <span class="icon-viewers">👥</span>
+                            <span id="txtViewersCount">12</span>
+                            <span class="live-dot-square">■</span>
+                            <span class="live-text-label">LIVE</span>
+                        </div>
+
+                        <!-- زر إرجاع / إغلاق المشغل -->
+                        <button id="btnClosePlayer" class="btn-player-back" title="Back">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- كبسولة التحكم الوسطى (إرجاع، تشغيل/إيقاف، تقديم) -->
+                <div class="player-center-pill">
+                    <!-- زر إرجاع 10 ثوانٍ -->
+                    <button class="center-ctrl-btn" id="btnSeekRewind" title="Rewind 10s">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF">
+                            <polygon points="11 19 2 12 11 5 11 19"></polygon>
+                            <polygon points="22 19 13 12 22 5 22 19"></polygon>
+                        </svg>
+                    </button>
+
+                    <!-- زر التشغيل / الإيقاف المؤقت الدائري الكبير -->
+                    <button class="center-play-btn" id="btnTogglePlay" title="Play/Pause">
+                        <svg id="iconPlay" width="26" height="26" viewBox="0 0 24 24" fill="#000000" style="display: none; margin-left: 3px;">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <svg id="iconPause" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                    </button>
+
+                    <!-- زر تقديم 10 ثوانٍ -->
+                    <button class="center-ctrl-btn" id="btnSeekForward" title="Forward 10s">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF">
+                            <polygon points="13 19 22 12 13 5 13 19"></polygon>
+                            <polygon points="2 19 11 12 2 5 2 19"></polygon>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- الشريط السفلي للتحكم بالأبعاد والشاشات -->
+                <div class="player-bottom-bar">
+                    <!-- شريط التقدم باللون الأحمر الفاقع -->
+                    <div class="scrub-bar-container" id="scrubContainer">
+                        <div class="scrub-bar-track">
+                            <div class="scrub-bar-fill" id="scrubFill"></div>
+                        </div>
+                    </div>
+
+                    <div class="bottom-controls-row">
+                        <!-- عداد التوقيت -->
+                        <div class="player-times">
+                            <span id="txtCurrentTime">00:00</span>
+                            <span class="time-sep">/</span>
+                            <span id="txtTotalDuration">LIVE</span>
+                        </div>
+
+                        <!-- الأيقونات الأربعة من اليمين إلى اليسار كما طلبت بدقة -->
+                        <div class="bottom-action-icons">
+                            <!-- 4. تبديل حجم الشاشة (Fit, Fill, Stretch) -->
+                            <button class="icon-tool-btn" id="btnAspectRatio" title="Screen Aspect Ratio">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
+                                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                    <line x1="2" y1="9" x2="22" y2="9"></line>
+                                </svg>
+                            </button>
+
+                            <!-- 3. زر الترس: نافذة Track Selection المنبثقة -->
+                            <button class="icon-tool-btn" id="btnTrackSelection" title="Track Selection">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                </svg>
+                            </button>
+
+                            <!-- 2. تصغير الشاشة لنافذة عائمة (Picture-in-Picture) -->
+                            <button class="icon-tool-btn" id="btnMiniPlayer" title="Minimize / PiP">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                                    <rect x="12" y="12" width="7" height="7" fill="#FFFFFF"></rect>
+                                </svg>
+                            </button>
+
+                            <!-- 1. أقصى اليمين: ملء الشاشة وتحويلها إلى وضع أفقي (Landscape) -->
+                            <button class="icon-tool-btn" id="btnOrientationToggle" title="Rotate / Fullscreen">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- شاشة المعلومات الكاملة (About / Privacy / Terms) -->
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
+    <!-- 4. نافذة Track Selection المنبثقة (نسخة طبق الأصل)       -->
+    <!-- ======================================================= -->
+    <div id="trackSelectionModal" class="modal-backdrop" style="display: none;">
+        <div class="track-modal-card">
+            <!-- الشعار الدائري الأحمر مع أعمدة المعادل -->
+            <div class="track-modal-header">
+                <div class="track-icon-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF">
+                        <rect x="4" y="9" width="3" height="11" rx="1"></rect>
+                        <rect x="10.5" y="4" width="3" height="16" rx="1"></rect>
+                        <rect x="17" y="12" width="3" height="8" rx="1"></rect>
+                    </svg>
+                </div>
+                <h3>Track Selection</h3>
+            </div>
+
+            <!-- أزرار الخيارات الثلاثة -->
+            <button class="track-opt-btn" id="btnOptAudio">Audio Tracks</button>
+            <button class="track-opt-btn" id="btnOptQuality">Video Quality</button>
+            <button class="track-opt-btn" id="btnOptSubtitles">Subtitles</button>
+
+            <!-- زر الإلغاء باللون الأحمر -->
+            <button class="track-cancel-btn" id="btnCancelTrackModal">Cancel</button>
+        </div>
+    </div>
+
+    <!-- نافذة الشاشات الكاملة (About / Terms / Privacy) -->
     <div id="fullInfoOverlay" class="full-info-overlay" style="display: none;">
         <div class="full-info-window">
             <div class="info-top-nav">
@@ -189,35 +291,24 @@
                 <h3 id="txtInfoNavTitle">Information</h3>
                 <div style="width: 28px;"></div>
             </div>
-
             <div class="info-hero-area">
                 <h2 id="txtInfoHeroTitle">Title</h2>
                 <p id="txtInfoHeroSubtitle">Subtitle</p>
             </div>
-
             <div id="infoCardsList" class="info-cards-list"></div>
-
             <div class="info-copyright-footer">
                 NHN LIVE © 2026<br>All Rights Reserved
             </div>
         </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- نافذة Contact Support & Ads المنبثقة            -->
-    <!-- ============================================== -->
+    <!-- نافذة التواصل -->
     <div id="contactModalDialog" class="modal-backdrop" style="display: none;">
         <div class="contact-card">
-            <h3 id="txtContactDialogTitle">Contact Support & Ads</h3>
-            <p id="txtContactDialogSub">Choose your preferred contact method:</p>
-
-            <button id="btnContactTelegram" class="btn-contact-telegram">
-                Telegram: @nhnlive_support
-            </button>
-
-            <!-- <button id="btnContactEmail" class="btn-contact-email">
-                Email: admin@nhnlive.com
-            </button> -->
+            <h3>Contact Support & Ads</h3>
+            <p>Choose your preferred contact method:</p>
+            <button id="btnContactTelegram" class="btn-contact-telegram">Telegram: @nhnlive_support</button>
+            <button id="btnContactEmail" class="btn-contact-email">Email: admin@nhnlive.com</button>
         </div>
     </div>
 
