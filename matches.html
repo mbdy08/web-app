@@ -10,7 +10,7 @@
 <body class="dark-theme">
 
     <div class="matches-app-container">
-        <!-- شريط الرأس العلوي -->
+        <!-- شريط الرأس الرئيسي للجدول -->
         <header class="matches-header">
             <div class="header-left">
                 <div class="header-logo-circle">
@@ -21,7 +21,6 @@
                 </div>
             </div>
 
-            <!-- زر التيليجرام العلوي -->
             <button id="btnTopTelegram" class="icon-btn-telegram" title="Telegram Channel">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="11" fill="#0088CC"/>
@@ -30,9 +29,7 @@
             </button>
         </header>
 
-        <!-- ============================================== -->
-        <!-- 1. قسم المباريات (Matches Tab)                 -->
-        <!-- ============================================== -->
+        <!-- قسم المباريات -->
         <main id="sectionMatches" class="main-tab-content">
             <div class="days-tab-bar">
                 <button class="day-tab-btn" data-day="yesterday" id="tabYesterday">Yesterday</button>
@@ -52,9 +49,7 @@
             </div>
         </main>
 
-        <!-- ============================================== -->
-        <!-- 2. قسم الإعدادات (Settings Tab)                -->
-        <!-- ============================================== -->
+        <!-- قسم الإعدادات -->
         <main id="sectionSettings" class="main-tab-content" style="display: none;">
             <h2 id="txtSettingsMainTitle" class="settings-main-title">Settings & More</h2>
 
@@ -114,7 +109,7 @@
             </div>
         </main>
 
-        <!-- شريط التنقل السفلي الثابت -->
+        <!-- شريط التنقل السفلي -->
         <nav class="bottom-nav-bar">
             <button id="btnNavMatches" class="nav-tab-btn active">
                 <span class="nav-icon">⚽</span>
@@ -127,159 +122,146 @@
         </nav>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- 3. مشغل الفيديو الاحترافي المتكامل (مطابق للصور 100%)    -->
-    <!-- ======================================================= -->
-    <div id="playerOverlayModal" class="player-overlay" style="display: none;">
-        <div class="player-viewport" id="playerViewport">
-            <!-- شاشة الفيديو الأصلية -->
-            <video id="hlsVideoPlayer" playsinline></video>
+    <!-- ============================================================= -->
+    <!-- مشغل دراما لايف الاحترافي المطور (خبط لزق من الصورة الأخيرة)   -->
+    <!-- ============================================================= -->
+    <div id="playerOverlayModal" class="drama-player-modal" style="display: none;">
+        <div class="drama-player-wrapper" id="playerViewport">
             
-            <!-- طبقة التحميل الدوارة -->
-            <div id="playerBuffering" class="player-buffering" style="display: none;">
-                <div class="spinner"></div>
+            <!-- 1. الشريط العلوي (زر الرجوع + عنوان القناة/المباراة + زر التحديث) -->
+            <div class="drama-channel-header" id="dramaChannelHeader">
+                <button id="btnClosePlayer" class="drama-header-btn" title="Back">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+                <div class="drama-header-title-box">
+                    <span id="txtPlayerChannelTitle" class="drama-channel-name">NHN LIVE Stream</span>
+                </div>
+                <button id="btnPlayerRefresh" class="drama-header-btn" title="Refresh Stream">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a9 9 0 1 1-.57-8.38l5.67-5.67"/>
+                    </svg>
+                </button>
             </div>
 
-            <!-- طبقة واجهة التحكم بالكامل (تختفي وتظهر باللمس) -->
-            <div class="player-ui-layer" id="playerUiLayer">
-                <!-- الشريط العلوي للمشغل -->
-                <div class="player-top-bar">
-                    <!-- كبسولات الجودة: HD ثم SD ثم 4K -->
-                    <div class="player-quality-pills">
-                        <button id="btnQualHd" class="q-pill active" onclick="switchStreamQuality('HD')">HD</button>
-                        <button id="btnQualSd" class="q-pill" onclick="switchStreamQuality('SD')">SD</button>
-                        <button id="btnQual4k" class="q-pill" onclick="switchStreamQuality('4K')">4K</button>
+            <!-- حاوية الفيديو وشاشته -->
+            <div class="drama-video-container" id="videoContainerBox">
+                <video id="hlsVideoPlayer" playsinline></video>
+                
+                <div id="playerBuffering" class="player-buffering" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
+
+                <!-- 2. كبسولة السيرفرات العائمة العلوية داخل الفيديو -->
+                <div class="drama-servers-capsule" id="dramaServersCapsule">
+                    <!-- خيار الخوادم -->
+                    <div class="servers-label-badge" id="btnReloadServer">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+                            <path d="M21.5 2v6h-6M21.34 15.57a9 9 0 1 1-.57-8.38l5.67-5.67"/>
+                        </svg>
+                        <span id="lblServersTxt">الخوادم</span>
                     </div>
 
-                    <div class="player-top-right-group">
+                    <!-- أزرار الجودات والسيرفرات (1 HD / 2 SD / 3 4K) -->
+                    <div class="servers-pills-row">
+                        <button id="btnQualHd" class="server-circle-btn active" onclick="switchStreamQuality('HD')">
+                            <span class="server-num">1</span>
+                            <span class="server-sub">HD</span>
+                        </button>
+                        <button id="btnQualSd" class="server-circle-btn" onclick="switchStreamQuality('SD')">
+                            <span class="server-num">2</span>
+                            <span class="server-sub">SD</span>
+                        </button>
+                        <button id="btnQual4k" class="server-circle-btn" onclick="switchStreamQuality('4K')">
+                            <span class="server-num">3</span>
+                            <span class="server-sub">4K</span>
+                        </button>
+                    </div>
+
+                    <!-- فاصل رأسي -->
+                    <div class="capsule-sep"></div>
+
+                    <!-- أزرار التحكم الجانبية في الكبسولة -->
+                    <div class="capsule-actions-row">
+                        <!-- زر أبعاد الشاشة والنقاط الثلاث -->
+                        <button id="btnAspectRatio" class="capsule-icon-btn" title="حجم الشاشة">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="13" rx="2"></rect>
+                                <circle cx="7" cy="20" r="1.5" fill="#FFFFFF"></circle>
+                                <circle cx="12" cy="20" r="1.5" fill="#FFFFFF"></circle>
+                                <circle cx="17" cy="20" r="1.5" fill="#FFFFFF"></circle>
+                            </svg>
+                        </button>
+
+                        <!-- زر التوسيع والمحاذاة -->
+                        <button id="btnCenterAlign" class="capsule-icon-btn" title="توسيع">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                            </svg>
+                        </button>
+
                         <!-- شارة المشاهدين المباشرة -->
-                        <div class="live-status-pill">
-                            <span class="icon-viewers">👥</span>
-                            <span id="txtViewersCount">12</span>
-                            <span class="live-dot-square">■</span>
-                            <span class="live-text-label">LIVE</span>
+                        <div class="drama-live-viewers-pill">
+                            <span class="viewers-ico">👥</span>
+                            <span id="txtViewersCount">5.8K</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. شريط التقدم الأحمر السفلي -->
+                <div class="drama-scrubber-track" id="scrubContainer">
+                    <div class="drama-scrubber-fill" id="scrubFill"></div>
+                    <div class="drama-scrubber-thumb"></div>
+                </div>
+
+                <!-- 4. شريط التحكم السفلي (زر التشغيل المربع + LIVE + الصوت + التوسيع القُطري) -->
+                <div class="drama-bottom-controls" id="dramaBottomControls">
+                    <div class="ctrl-left-side">
+                        <!-- زر التشغيل / الإيقاف المربع نصف الشفاف -->
+                        <button id="btnTogglePlay" class="drama-square-play-btn" title="Play / Pause">
+                            <svg id="iconPlay" width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF" style="display: none; margin-left: 2px;">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            <svg id="iconPause" width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF">
+                                <rect x="6" y="4" width="4" height="16"></rect>
+                                <rect x="14" y="4" width="4" height="16"></rect>
+                            </svg>
+                        </button>
+
+                        <!-- مؤشر البث المباشر الأحمر -->
+                        <div class="drama-live-indicator">
+                            <span class="drama-live-dot"></span>
+                            <span class="drama-live-txt">LIVE</span>
+                        </div>
+                    </div>
+
+                    <div class="ctrl-right-side">
+                        <!-- أيقونة الصوت وأشرطة المعادل الرأسية -->
+                        <div class="drama-volume-box" id="btnToggleMute">
+                            <svg id="iconVolume" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            </svg>
+                            <div class="drama-eq-bars" id="eqBars">
+                                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                            </div>
                         </div>
 
-                        <!-- زر إرجاع / إغلاق المشغل -->
-                        <button id="btnClosePlayer" class="btn-player-back" title="Back">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                        <!-- زر ملء الشاشة القُطري -->
+                        <button id="btnOrientationToggle" class="drama-diag-expand-btn" title="Fullscreen">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
                             </svg>
                         </button>
                     </div>
                 </div>
 
-                <!-- كبسولة التحكم الوسطى (إرجاع، تشغيل/إيقاف، تقديم) -->
-                <div class="player-center-pill">
-                    <!-- زر إرجاع 10 ثوانٍ -->
-                    <button class="center-ctrl-btn" id="btnSeekRewind" title="Rewind 10s">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF">
-                            <polygon points="11 19 2 12 11 5 11 19"></polygon>
-                            <polygon points="22 19 13 12 22 5 22 19"></polygon>
-                        </svg>
-                    </button>
-
-                    <!-- زر التشغيل / الإيقاف المؤقت الدائري الكبير -->
-                    <button class="center-play-btn" id="btnTogglePlay" title="Play/Pause">
-                        <svg id="iconPlay" width="26" height="26" viewBox="0 0 24 24" fill="#000000" style="display: none; margin-left: 3px;">
-                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                        </svg>
-                        <svg id="iconPause" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
-                            <rect x="6" y="4" width="4" height="16"></rect>
-                            <rect x="14" y="4" width="4" height="16"></rect>
-                        </svg>
-                    </button>
-
-                    <!-- زر تقديم 10 ثوانٍ -->
-                    <button class="center-ctrl-btn" id="btnSeekForward" title="Forward 10s">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF">
-                            <polygon points="13 19 22 12 13 5 13 19"></polygon>
-                            <polygon points="2 19 11 12 2 5 2 19"></polygon>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- الشريط السفلي للتحكم بالأبعاد والشاشات -->
-                <div class="player-bottom-bar">
-                    <!-- شريط التقدم باللون الأحمر الفاقع -->
-                    <div class="scrub-bar-container" id="scrubContainer">
-                        <div class="scrub-bar-track">
-                            <div class="scrub-bar-fill" id="scrubFill"></div>
-                        </div>
-                    </div>
-
-                    <div class="bottom-controls-row">
-                        <!-- عداد التوقيت -->
-                        <div class="player-times">
-                            <span id="txtCurrentTime">00:00</span>
-                            <span class="time-sep">/</span>
-                            <span id="txtTotalDuration">LIVE</span>
-                        </div>
-
-                        <!-- الأيقونات الأربعة من اليمين إلى اليسار كما طلبت بدقة -->
-                        <div class="bottom-action-icons">
-                            <!-- 4. تبديل حجم الشاشة (Fit, Fill, Stretch) -->
-                            <button class="icon-tool-btn" id="btnAspectRatio" title="Screen Aspect Ratio">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
-                                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                                    <line x1="2" y1="9" x2="22" y2="9"></line>
-                                </svg>
-                            </button>
-
-                            <!-- 3. زر الترس: نافذة Track Selection المنبثقة -->
-                            <button class="icon-tool-btn" id="btnTrackSelection" title="Track Selection">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                                </svg>
-                            </button>
-
-                            <!-- 2. تصغير الشاشة لنافذة عائمة (Picture-in-Picture) -->
-                            <button class="icon-tool-btn" id="btnMiniPlayer" title="Minimize / PiP">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round">
-                                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                                    <rect x="12" y="12" width="7" height="7" fill="#FFFFFF"></rect>
-                                </svg>
-                            </button>
-
-                            <!-- 1. أقصى اليمين: ملء الشاشة وتحويلها إلى وضع أفقي (Landscape) -->
-                            <button class="icon-tool-btn" id="btnOrientationToggle" title="Rotate / Fullscreen">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
-                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
-    </div>
-
-    <!-- ======================================================= -->
-    <!-- 4. نافذة Track Selection المنبثقة (نسخة طبق الأصل)       -->
-    <!-- ======================================================= -->
-    <div id="trackSelectionModal" class="modal-backdrop" style="display: none;">
-        <div class="track-modal-card">
-            <!-- الشعار الدائري الأحمر مع أعمدة المعادل -->
-            <div class="track-modal-header">
-                <div class="track-icon-badge">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF">
-                        <rect x="4" y="9" width="3" height="11" rx="1"></rect>
-                        <rect x="10.5" y="4" width="3" height="16" rx="1"></rect>
-                        <rect x="17" y="12" width="3" height="8" rx="1"></rect>
-                    </svg>
-                </div>
-                <h3>Track Selection</h3>
-            </div>
-
-            <!-- أزرار الخيارات الثلاثة -->
-            <button class="track-opt-btn" id="btnOptAudio">Audio Tracks</button>
-            <button class="track-opt-btn" id="btnOptQuality">Video Quality</button>
-            <button class="track-opt-btn" id="btnOptSubtitles">Subtitles</button>
-
-            <!-- زر الإلغاء باللون الأحمر -->
-            <button class="track-cancel-btn" id="btnCancelTrackModal">Cancel</button>
         </div>
     </div>
 
