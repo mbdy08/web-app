@@ -290,8 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     function unlockApp() {
         localStorage.setItem("NHN_LIVE_LOGGED_IN", "true");
-        alert(isArabic ? "✅ تم تفعيل الكود بنجاح! يتم الانتقال إلى جدول المباريات..." : "✅ Activation Successful! Redirecting to Matches...");
-        console.log("APP UNLOCKED WITH SECRET CODE: " + SECRET_CODE);
+        window.location.href = "matches.html";
     }
 
     function handlePlayStream(inputVal) {

@@ -1,0 +1,608 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body.dark-theme {
+    background-color: #0E1117;
+    color: #FFFFFF;
+}
+
+body.light-theme {
+    background-color: #F4F6F9;
+    color: #111111;
+}
+
+.matches-app-container {
+    width: 100%;
+    max-width: 440px;
+    min-height: 100vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 18px 90px 18px; /* مسافة للشريط السفلي */
+    position: relative;
+}
+
+/* شريط الرأس */
+.matches-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-logo-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-logo-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.logo-title {
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+}
+
+.txt-white {
+    color: #FFFFFF;
+}
+
+body.light-theme .txt-white {
+    color: #111111;
+}
+
+.txt-red {
+    color: #E52535;
+}
+
+.icon-btn-telegram {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #1A1E29;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+body.light-theme .icon-btn-telegram {
+    background-color: #FFFFFF;
+}
+
+/* أزرار اختيار الأيام (الأمس، اليوم، الغد) */
+.days-tab-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.day-tab-btn {
+    flex: 1;
+    height: 42px;
+    border-radius: 21px;
+    border: none;
+    background-color: #1A1E29;
+    color: #8E95A5;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+body.light-theme .day-tab-btn {
+    background-color: #FFFFFF;
+    color: #556070;
+}
+
+.day-tab-btn.active {
+    background-color: #E52535 !important;
+    color: #FFFFFF !important;
+}
+
+/* بطاقات المباريات (خبط لزق من صورة أندرويد) */
+.matches-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.match-card {
+    background-color: #141824;
+    border-radius: 26px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    border: 1px solid #1C222F;
+}
+
+body.light-theme .match-card {
+    background-color: #FFFFFF;
+    border-color: #E2E8F0;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.match-league-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.league-crest {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.league-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: #FFFFFF;
+}
+
+body.light-theme .league-name {
+    color: #111111;
+}
+
+/* صف الفريقين والتوقيت */
+.match-teams-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.team-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+}
+
+.team-logo {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.team-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.3;
+}
+
+body.light-theme .team-name {
+    color: #111111;
+}
+
+/* صندوق التوقيت في المنتصف */
+.match-time-box {
+    background-color: #0E1117;
+    border-radius: 16px;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 100px;
+}
+
+body.light-theme .match-time-box {
+    background-color: #F0F2F5;
+}
+
+.time-val {
+    font-size: 13px;
+    font-weight: 800;
+    color: #FFFFFF;
+}
+
+body.light-theme .time-val {
+    color: #111111;
+}
+
+.status-val {
+    font-size: 11px;
+    font-weight: 700;
+    color: #8E95A5;
+}
+
+.status-val.live {
+    color: #E52535;
+    animation: pulseStatus 1s infinite alternate;
+}
+
+@keyframes pulseStatus {
+    from { opacity: 1; }
+    to { opacity: 0.45; }
+}
+
+/* زر المشاهدة الأحمر الكبير */
+.btn-watch-match {
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+    background-color: #E52535;
+    border: none;
+    color: #FFFFFF;
+    font-size: 14.5px;
+    font-weight: 800;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+}
+
+.btn-watch-match:active {
+    transform: scale(0.98);
+    background-color: #C71B29;
+}
+
+/* ============================================== */
+/* شاشات الإعدادات (Settings) */
+/* ============================================== */
+.settings-main-title {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+.settings-group-card {
+    background-color: #141824;
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+body.light-theme .settings-group-card {
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.group-header-label {
+    font-size: 14px;
+    font-weight: 800;
+    color: #8E95A5;
+    margin-bottom: 4px;
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+}
+
+.setting-clickable-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+}
+
+.setting-title {
+    font-size: 14.5px;
+    font-weight: 700;
+}
+
+.setting-arrow {
+    font-size: 18px;
+    color: #8E95A5;
+    font-weight: bold;
+}
+
+/* كبسولة خيارات الإعدادات */
+.pill-switch-container {
+    background-color: #0E1117;
+    border-radius: 18px;
+    display: flex;
+    padding: 3px;
+    gap: 2px;
+}
+
+body.light-theme .pill-switch-container {
+    background-color: #F0F2F5;
+}
+
+.pill-opt-btn {
+    border: none;
+    background: transparent;
+    color: #8E95A5;
+    padding: 6px 14px;
+    border-radius: 15px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pill-opt-btn.active {
+    background-color: #E52535;
+    color: #FFFFFF;
+}
+
+.version-badge {
+    color: #E52535;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/* ============================================== */
+/* شريط التنقل السفلي الثابت (Floating Bottom Nav) */
+/* ============================================== */
+.bottom-nav-bar {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 36px);
+    max-width: 404px;
+    height: 60px;
+    background-color: #141824;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    border: 1px solid #1C222F;
+}
+
+body.light-theme .bottom-nav-bar {
+    background-color: #FFFFFF;
+    border-color: #E2E8F0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.nav-tab-btn {
+    flex: 1;
+    height: 100%;
+    border-radius: 25px;
+    border: none;
+    background: transparent;
+    color: #8E95A5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.nav-tab-btn.active {
+    background-color: #E52535;
+    color: #FFFFFF;
+}
+
+/* ============================================== */
+/* المشغل الفوري المنبثق (Player Overlay) */
+/* ============================================== */
+.player-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.player-content-box {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.player-top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #121620;
+    border-bottom: 1px solid #1C212B;
+    direction: ltr; /* اتجاه عالمي للأزرار */
+}
+
+.player-quality-group {
+    display: flex;
+    gap: 8px;
+}
+
+.quality-btn {
+    background-color: #1C212B;
+    color: #8E95A5;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 17px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.quality-btn.active {
+    background-color: #E52535;
+    color: #FFFFFF;
+}
+
+.player-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.live-badge-card {
+    display: flex;
+    align-items: center;
+    background: rgba(18, 22, 34, 0.9);
+    padding: 6px 12px;
+    border-radius: 17px;
+    font-size: 12px;
+    font-weight: 800;
+    gap: 6px;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #E52535;
+    border-radius: 50%;
+}
+
+.live-txt {
+    color: #E52535;
+}
+
+.btn-close-video {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #1C212B;
+    color: #FFFFFF;
+    border: none;
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.video-screen-wrapper {
+    position: relative;
+    width: 100%;
+    background-color: #000;
+    aspect-ratio: 16 / 9;
+}
+
+.video-screen-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.player-buffering {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* أدوات التحميل */
+.loading-box {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.spinner {
+    width: 38px;
+    height: 38px;
+    border: 3.5px solid rgba(229, 37, 53, 0.2);
+    border-top-color: #E52535;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.no-matches-box {
+    text-align: center;
+    padding: 60px 0;
+    color: #8E95A5;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* نافذة معلومات الإعدادات */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 2500;
+}
+
+.info-dialog-card {
+    background-color: #141824;
+    border-radius: 24px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1C212B;
+    margin-bottom: 14px;
+}
+
+.info-dialog-body {
+    overflow-y: auto;
+    font-size: 13.5px;
+    color: #A0AEC0;
+    line-height: 1.6;
+}
+
+.btn-close-dialog {
+    background: transparent;
+    border: none;
+    color: #FFFFFF;
+    font-size: 18px;
+    cursor: pointer;
+}
