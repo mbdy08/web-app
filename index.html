@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NHN LIVE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- شريط الرأس العلوي -->
+        <header class="app-header">
+            <button id="btnMenu" class="icon-btn" aria-label="Menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <div class="logo-title">
+                <span class="txt-white">NHN</span> <span class="txt-red">LIVE</span>
+            </div>
+
+            <button id="btnLanguage" class="icon-btn globe-btn" aria-label="Language">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#29B6F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+            </button>
+        </header>
+
+        <!-- الشعار الرئيسي الدائري -->
+        <div class="main-logo-area">
+            <div class="logo-circle">
+                <img src="logo.png" alt="NHN LIVE" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png';">
+            </div>
+            <h1 id="headerMainTitle">Direct Stream</h1>
+            <p id="headerSubtitle">Paste a valid URL to start playback.</p>
+        </div>
+
+        <!-- البطاقة الرئيسية الكبرى -->
+        <div class="main-card">
+            <!-- الشريط الداخلي العلوي -->
+            <div class="card-top-info">
+                <div class="link-icon-badge">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E52535" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                </div>
+                <div class="card-titles">
+                    <h3 id="cardTopTitle">Direct</h3>
+                    <p id="cardTopSubtitle">Open the URL directly</p>
+                </div>
+            </div>
+
+            <!-- أزرار التبويبات الأربعة -->
+            <div class="tabs-row">
+                <button class="tab-btn active" data-tab="0" id="tabDirect">Direct</button>
+                <button class="tab-btn" data-tab="1" id="tabWeb">Web</button>
+                <button class="tab-btn" data-tab="2" id="tabM3u">M3U</button>
+                <button class="tab-btn" data-tab="3" id="tabXtream">Xtream</button>
+            </div>
+
+            <!-- القسم 1: إدخال الرابط (Direct / Web / M3U) -->
+            <div id="sectionUrlInput" class="content-section">
+                <div class="input-wrapper">
+                    <input type="text" id="etStreamUrl" placeholder="Paste a valid URL" autocomplete="off" spellcheck="false">
+                    <button class="paste-btn" data-target="etStreamUrl" title="Paste">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8E95A5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                    </button>
+                </div>
+                <button id="btnPlayNow" class="btn-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <span id="txtPlayNow">Play now</span>
+                </button>
+            </div>
+
+            <!-- القسم 2: قائمة Xtream الرئيسية -->
+            <div id="sectionXtreamMenu" class="content-section" style="display: none;">
+                <div class="section-heading">
+                    <h4 id="txtAddProfile">Add Profile</h4>
+                    <p id="txtChooseConnect">Choose how you want to connect.</p>
+                </div>
+
+                <div class="profile-option-card" id="rowNhnCodeOption">
+                    <span class="option-title" id="txtOptNhnCode">NHN Code</span>
+                    <span class="option-badge">Code</span>
+                </div>
+
+                <div class="profile-option-card" id="rowXtreamServerOption">
+                    <span class="option-title" id="txtOptXtreamIptv">Xtream IPTV</span>
+                    <span class="option-badge">Server Login</span>
+                </div>
+
+                <button id="btnCancelXtreamMenu" class="btn-secondary" style="margin-top: 18px;">
+                    <span id="txtCancelMenu">Cancel</span>
+                </button>
+            </div>
+
+            <!-- القسم 3: إدخال كود NHN Code -->
+            <div id="sectionNhnCodeInput" class="content-section" style="display: none;">
+                <div class="section-heading">
+                    <h4 id="txtNhnCodeTitle">NHN Code</h4>
+                    <p id="txtNhnCodeSubtitle">Enter your activation code.</p>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="text" id="etNhnCode" placeholder="Enter code" autocomplete="off" spellcheck="false">
+                    <button class="paste-btn" data-target="etNhnCode" title="Paste">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8E95A5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                    </button>
+                </div>
+
+                <button id="btnConnectNhnCode" class="btn-primary">
+                    <span id="txtConnectNhn">Connect</span>
+                </button>
+                <button id="btnCancelNhnCode" class="btn-secondary">
+                    <span id="txtCancelNhn">Cancel</span>
+                </button>
+            </div>
+
+            <!-- القسم 4: تسجيل دخول سيرفر Xtream الحقيقي -->
+            <div id="sectionXtreamLoginInput" class="content-section" style="display: none;">
+                <div class="section-heading">
+                    <h4 id="txtXtreamLoginTitle">Xtream Codes Login</h4>
+                    <p id="txtXtreamLoginSubtitle">Enter the server, username and password supplied by your IPTV provider.</p>
+                </div>
+
+                <div class="input-wrapper" style="margin-bottom: 12px;">
+                    <input type="text" id="etXtreamServer" placeholder="http://server.com:8080" autocomplete="off">
+                </div>
+                <div class="input-wrapper" style="margin-bottom: 12px;">
+                    <input type="text" id="etXtreamUser" placeholder="Username" autocomplete="off">
+                </div>
+                <div class="input-wrapper" style="margin-bottom: 14px;">
+                    <input type="password" id="etXtreamPass" placeholder="Password">
+                </div>
+
+                <div id="tvXtreamError" class="error-msg" style="display: none;"></div>
+
+                <button id="btnSaveAndConnect" class="btn-primary">
+                    <span id="txtConnectXtream">Connect IPTV</span>
+                </button>
+                <button id="btnCancelXtreamLogin" class="btn-secondary">
+                    <span id="txtCancelXtream">Cancel</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- التذييل السفلي -->
+        <footer class="app-footer">
+            NHN LIVE © 2026 • All Rights Reserved
+        </footer>
+    </div>
+
+    <!-- نافذة اختيار اللغة المنبثقة -->
+    <div id="languageModal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card">
+            <h3 id="txtModalTitle">Choose App Language</h3>
+            <button class="lang-choice-btn" id="btnChooseArabic">العربية</button>
+            <button class="lang-choice-btn active" id="btnChooseEnglish">English</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
