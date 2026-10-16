@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. فحص الحماية: التأكد من تسجيل الدخول بكود 7777
+    // 1. حماية الصفحة: التأكد من تفعيل كود 7777
     if (localStorage.getItem("NHN_LIVE_LOGGED_IN") !== "true") {
         window.location.href = "index.html";
         return;
     }
 
-    // الروابط السحابية لملف المباريات على GitHub
+    // روابط السحابة والدعم
     const MATCHES_URL = "https://raw.githubusercontent.com/mbdy08/matches/main/matches.json";
     const MATCHES_BACKUP_URL = "https://cdn.jsdelivr.net/gh/mbdy08/matches@main/matches.json";
     const TELEGRAM_URL = "https://t.me/nhnlive";
@@ -20,7 +20,92 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentActiveQuality = "HD";
     let hlsInstance = null;
 
-    // قاموس الترجمة الكامل لصفحة المباريات والإعدادات
+    // بنود الشاشات الثلاث (About Us, Terms, Privacy Policy)
+    const detailedInfoData = {
+        about: {
+            en: {
+                nav: "About Us",
+                hero: "About NHN LIVE",
+                sub: "NHN LIVE • Global Sports Platform",
+                cards: [
+                    { id: "1", title: "Our Platform & Vision", body: "NHN LIVE is an advanced, lightweight sports platform built specifically to deliver real-time football fixtures, kick-off schedules, and scores directly to passionate fans." },
+                    { id: "2", title: "Architecture & Speed", body: "Powered by native Android Media3 architecture, NHN LIVE ensures high-efficiency playback while saving phone battery and memory consumption." },
+                    { id: "3", title: "Coverage Scope", body: "Comprehensive coverage of premier tournaments including the UEFA Champions League, Premier League, La Liga, and regional championships." }
+                ]
+            },
+            ar: {
+                nav: "من نحن",
+                hero: "حول منصة NHN LIVE",
+                sub: "NHN LIVE • المنصة الرياضية العالمية",
+                cards: [
+                    { id: "1", title: "رؤيتنا ومنصتنا", body: "منصة NHN LIVE هي منصة رياضية خفيفة ومتطورة صُممت خصيصاً لتقديم جداول مباريات كرة القدم ومواعيد البث المباشر والنتائج بدقة لعشاق كرة القدم." },
+                    { id: "2", title: "السرعة والكفاءة", body: "تعتمد المنصة على بنية تشغيل متقدمة تضمن كفاءة البث واستقراره مع الحفاظ التام على أداء البطارية والذاكرة." },
+                    { id: "3", title: "نطاق التغطية", body: "تغطية شاملة لأقوى البطولات العالمية والمحلية بما فيها دوري أبطال أوروبا، الدوري الإنجليزي، الدوري الإسباني، والبطولات الإقليمية." }
+                ]
+            }
+        },
+        terms: {
+            en: {
+                nav: "Terms of Service",
+                hero: "Terms of Service & Disclaimer",
+                sub: "NHN LIVE • Legal Terms",
+                cards: [
+                    { id: "1", title: "Media Interface", body: "NHN LIVE functions strictly as a smart video player interface and match schedule indexer." },
+                    { id: "2", title: "No Content Hosting", body: "The platform does NOT host, stream, record, or store any television channels or copyrighted streams on its own servers." },
+                    { id: "3", title: "External Sources", body: "All stream links are indexed from publicly accessible external web networks without direct liability." },
+                    { id: "4", title: "Trademarks & IP", body: "All team crests, competition logos, and club names remain the exclusive intellectual property of their respective trademark holders." }
+                ]
+            },
+            ar: {
+                nav: "شروط الاستخدام",
+                hero: "شروط الاستخدام وإخلاء المسؤولية",
+                sub: "NHN LIVE • الشروط القانونية",
+                cards: [
+                    { id: "1", title: "واجهة وسائط ذكية", body: "تعمل منصة NHN LIVE حصرياً كواجهة عرض لمشغل الفيديو وفهرس لجداول المباريات الرياضية." },
+                    { id: "2", title: "عدم استضافة المحتوى", body: "المنصة لا تستضيف ولا تبث ولا تسجل أو تخزن أي قنوات تلفزيونية أو بثوث محمية بحقوق النشر على خوادمها الخاصة." },
+                    { id: "3", title: "المصادر الخارجية", body: "جميع روابط البث مفهرسة ومجلوبة من شبكات إنترنت عامة ومتاحة للعموم دون أي مسؤولية مباشرة." },
+                    { id: "4", title: "العلامات التجارية والملكية", body: "جميع شعارات الأندية والبطولات والأسماء هي ملكية فكرية حصرية لمالكيها وعلاماتها التجارية الرسمية." }
+                ]
+            }
+        },
+        privacy: {
+            en: {
+                nav: "Privacy Policy",
+                hero: "Privacy Policy",
+                sub: "NHN LIVE • Last updated: September 2026",
+                cards: [
+                    { id: "1", title: "Introduction", body: "We respect your privacy and are committed to protecting it. This policy clarifies how data is handled when you use NHN LIVE." },
+                    { id: "2", title: "Data We Process", body: "The app requires no registration and does not collect names, phone numbers, or emails. Minimal anonymous technical diagnostics may be processed to optimize streaming." },
+                    { id: "3", title: "Permissions Required", body: "• Internet: Necessary for stream playback.\n• Storage: For saving optional preferences locally." },
+                    { id: "4", title: "Data Utilization", body: "To deliver and optimize application performance. We never sell, rent, or trade your data with external third parties." },
+                    { id: "5", title: "Third-Party Feeds", body: "The app may display media feeds from external public sources which operate under their own independent privacy terms." },
+                    { id: "6", title: "Intellectual Property", body: "NHN LIVE operates solely as a media display tool and does not claim ownership of external broadcasts." },
+                    { id: "7", title: "Data Security", body: "We implement standard technical measures to maintain connection integrity and protect local preference configurations." },
+                    { id: "8", title: "Children's Privacy", body: "The application is not directed at children under the age of 13, and no personal data is knowingly solicited." },
+                    { id: "9", title: "Your Controls", body: "You can clear cached data anytime via browser settings or storage." },
+                    { id: "10", title: "Policy Updates", body: "Any updates to this policy are reflected here immediately. Continued usage represents agreement to updated terms." }
+                ]
+            },
+            ar: {
+                nav: "سياسة الخصوصية",
+                hero: "سياسة الخصوصية",
+                sub: "NHN LIVE • آخر تحديث: سبتمبر 2026",
+                cards: [
+                    { id: "1", title: "مقدمة", body: "نحترم خصوصيتك ونلتزم بحمايتها. توضّح هذه السياسة كيفية التعامل مع البيانات عند استخدامك للمنصة." },
+                    { id: "2", title: "البيانات التي نجمعها", body: "لا تتطلب المنصة التسجيل ولا تجمع أي أسماء أو أرقام هواتف أو بريداً إلكترونياً." },
+                    { id: "3", title: "الأذونات المطلوبة", body: "• الإنترنت: ضروري لتحميل جدول المباريات وتشغيل البث.\n• الذاكرة المحلية: لحفظ تفضيلاتك من الوضع واللغة." },
+                    { id: "4", title: "استخدام البيانات", body: "لتحسين الأداء وضمان سرعة العرض. لا نقوم ببيع أو مشاركة أي بيانات مع أطراف ثالثة." },
+                    { id: "5", title: "المصادر الخارجية", body: "قد تعرض المنصة خلاصات ومصادر خارجية تعمل بموجب سياسات خصوصيتها المستقلة." },
+                    { id: "6", title: "الملكية الفكرية", body: "تعمل المنصة كأداة عرض ولا تدعي ملكية أي بث خارجي أو علامة تجارية." },
+                    { id: "7", title: "أمان البيانات", body: "نعتمد معايير أمان قياسية وتشفير اتصالات لحماية استقرار المنصة." },
+                    { id: "8", title: "خصوصية الأطفال", body: "التطبيق والمنصة غير موجهين لمن هم دون 13 عاماً." },
+                    { id: "9", title: "التحكم بالبيانات", body: "يمكنك مسح البيانات المحفوظة محلياً في أي وقت بمسح كاش المتصفح." },
+                    { id: "10", title: "تحديث السياسة", body: "أي تحديث يتم نشره هنا فوراً ويُعد استمرارك موافقة على التحديثات." }
+                ]
+            }
+        }
+    };
+
     const i18n = {
         en: {
             dir: "ltr",
@@ -28,9 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
             today: "Today",
             tomorrow: "Tomorrow",
             watchNow: "Watch Now",
-            notStarted: "Not Started",
-            live: "LIVE",
-            finished: "Finished",
             noMatches: "No matches scheduled",
             loading: "Loading matches...",
             matchesNav: "Matches",
@@ -41,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
             infoHeader: "Information",
             langLabel: "Language",
             themeLabel: "Theme",
-            notifLabel: "Notifications",
             downloadApp: "Download App (APK)",
             shareApp: "Share App with Friends",
             appVersion: "App Version",
@@ -49,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
             privacyPolicy: "Privacy Policy",
             terms: "Terms of Service",
             contact: "Contact Support & Ads",
-            shareMessage: "⚽ Download NHN LIVE app for live match schedules and scores:\n" + APP_DOWNLOAD_URL
+            shareMessage: "⚽ Download NHN LIVE app for live match schedules:\n" + APP_DOWNLOAD_URL
         },
         ar: {
             dir: "rtl",
@@ -57,10 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             today: "اليوم",
             tomorrow: "الغد",
             watchNow: "اضغط هنا للمشاهدة",
-            notStarted: "لم يبدأ بعد",
-            live: "بث مباشر",
-            finished: "انتهت",
-            noMatches: "لا توجد مباريات",
+            noMatches: "لا توجد مباريات مجدولة",
             loading: "جاري تحميل جدول المباريات...",
             matchesNav: "المباريات",
             settingsNav: "إعدادات",
@@ -70,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
             infoHeader: "معلومات",
             langLabel: "اللغة",
             themeLabel: "المظهر",
-            notifLabel: "الإشعارات",
             downloadApp: "تحميل التطبيق (Android APK)",
             shareApp: "مشاركة التطبيق مع الأصدقاء",
             appVersion: "إصدار التطبيق",
@@ -98,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const noMatchesBox = document.getElementById("noMatchesBox");
     const btnTopTelegram = document.getElementById("btnTopTelegram");
 
-    // عناصر المشغل المدمج
+    // عناصر المشغل
     const playerOverlayModal = document.getElementById("playerOverlayModal");
     const btnClosePlayer = document.getElementById("btnClosePlayer");
     const hlsVideoPlayer = document.getElementById("hlsVideoPlayer");
@@ -108,11 +185,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnQual4k = document.getElementById("btnQual4k");
     const playerBuffering = document.getElementById("playerBuffering");
 
-    // عناصر نافذة المعلومات المنبثقة
-    const infoDialogModal = document.getElementById("infoDialogModal");
-    const txtDialogTitle = document.getElementById("txtDialogTitle");
-    const infoDialogBody = document.getElementById("infoDialogBody");
-    const btnCloseInfoDialog = document.getElementById("btnCloseInfoDialog");
+    // عناصر الشاشات الكاملة
+    const fullInfoOverlay = document.getElementById("fullInfoOverlay");
+    const btnCloseFullInfo = document.getElementById("btnCloseFullInfo");
+    const txtInfoNavTitle = document.getElementById("txtInfoNavTitle");
+    const txtInfoHeroTitle = document.getElementById("txtInfoHeroTitle");
+    const txtInfoHeroSubtitle = document.getElementById("txtInfoHeroSubtitle");
+    const infoCardsList = document.getElementById("infoCardsList");
+
+    // عناصر نافذة التواصل
+    const contactModalDialog = document.getElementById("contactModalDialog");
+    const btnContactTelegram = document.getElementById("btnContactTelegram");
+    const btnContactEmail = document.getElementById("btnContactEmail");
 
     // ==========================================
     // 1. جلب المباريات من السحابة (GitHub JSON)
@@ -173,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 2. تصفية وعرض المباريات حسب اليوم
+    // 2. تصفية وعرض المباريات
     // ==========================================
     function filterMatchesByDay(day) {
         currentDayTab = day;
@@ -316,7 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 4. شريط التنقل السفلي (المباريات vs الإعدادات)
+    // 4. شريط التنقل السفلي
     // ==========================================
     btnNavMatches.addEventListener("click", () => {
         sectionSettings.style.display = "none";
@@ -333,14 +417,69 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 5. تطبيق اللغات والمظهر في الإعدادات
+    // 5. عرض الشاشات الكاملة (About / Terms / Privacy)
+    // ==========================================
+    function openDetailedSection(key) {
+        const langKey = isArabic ? "ar" : "en";
+        const data = detailedInfoData[key][langKey];
+
+        txtInfoNavTitle.textContent = data.nav;
+        txtInfoHeroTitle.textContent = data.hero;
+        txtInfoHeroSubtitle.textContent = data.sub;
+
+        infoCardsList.innerHTML = "";
+        data.cards.forEach(card => {
+            const cardEl = document.createElement("div");
+            cardEl.className = "info-card-item";
+            cardEl.innerHTML = `
+                <div class="info-card-head">
+                    <span class="info-card-title">${card.title}</span>
+                    <div class="info-card-badge">${card.id}</div>
+                </div>
+                <div class="info-card-body">${card.body}</div>
+            `;
+            infoCardsList.appendChild(cardEl);
+        });
+
+        fullInfoOverlay.style.display = "flex";
+    }
+
+    btnCloseFullInfo.addEventListener("click", () => {
+        fullInfoOverlay.style.display = "none";
+    });
+
+    document.getElementById("rowAboutUs").addEventListener("click", () => openDetailedSection("about"));
+    document.getElementById("rowPrivacyPolicy").addEventListener("click", () => openDetailedSection("privacy"));
+    document.getElementById("rowTerms").addEventListener("click", () => openDetailedSection("terms"));
+
+    // ==========================================
+    // 6. نافذة Contact Support & Ads المنبثقة
+    // ==========================================
+    document.getElementById("rowContact").addEventListener("click", () => {
+        contactModalDialog.style.display = "flex";
+    });
+
+    contactModalDialog.addEventListener("click", (e) => {
+        if (e.target === contactModalDialog) contactModalDialog.style.display = "none";
+    });
+
+    btnContactTelegram.addEventListener("click", () => {
+        contactModalDialog.style.display = "none";
+        window.open(TELEGRAM_SUPPORT_URL, "_blank");
+    });
+
+    btnContactEmail.addEventListener("click", () => {
+        contactModalDialog.style.display = "none";
+        window.location.href = "mailto:admin@nhnlive.com";
+    });
+
+    // ==========================================
+    // 7. تطبيق اللغات والمظهر
     // ==========================================
     const btnSettingLangEn = document.getElementById("btnSettingLangEn");
     const btnSettingLangAr = document.getElementById("btnSettingLangAr");
     const btnSettingThemeDark = document.getElementById("btnSettingThemeDark");
     const btnSettingThemeLight = document.getElementById("btnSettingThemeLight");
-    const btnSettingNotifOn = document.getElementById("btnSettingNotifOn");
-    const btnSettingNotifOff = document.getElementById("btnSettingNotifOff");
 
     function applyLanguage(arabic) {
         isArabic = arabic;
@@ -365,7 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("txtHeaderGeneral").textContent = t.generalHeader;
         document.getElementById("txtLabelLanguage").textContent = t.langLabel;
         document.getElementById("txtLabelTheme").textContent = t.themeLabel;
-        document.getElementById("txtLabelNotification").textContent = t.notifLabel;
 
         document.getElementById("txtHeaderApp").textContent = t.appHeader;
         document.getElementById("txtLabelDownload").textContent = t.downloadApp;
@@ -384,7 +522,6 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSettingLangEn.addEventListener("click", () => applyLanguage(false));
     btnSettingLangAr.addEventListener("click", () => applyLanguage(true));
 
-    // تبديل المظهر Dark / Light
     function applyTheme(dark) {
         isDarkMode = dark;
         localStorage.setItem("NHN_LIVE_THEME", dark ? "dark" : "light");
@@ -395,19 +532,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btnSettingThemeDark.addEventListener("click", () => applyTheme(true));
     btnSettingThemeLight.addEventListener("click", () => applyTheme(false));
-
-    // الإشعارات
-    btnSettingNotifOn.addEventListener("click", () => {
-        btnSettingNotifOn.classList.add("active");
-        btnSettingNotifOff.classList.remove("active");
-        alert(isArabic ? "تم تفعيل التنبيهات" : "Notifications enabled");
-    });
-
-    btnSettingNotifOff.addEventListener("click", () => {
-        btnSettingNotifOff.classList.add("active");
-        btnSettingNotifOn.classList.remove("active");
-        alert(isArabic ? "تم إيقاف التنبيهات" : "Notifications disabled");
-    });
 
     // مشاركة التطبيق
     document.getElementById("rowShareApp").addEventListener("click", async () => {
@@ -428,49 +552,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btnTopTelegram.addEventListener("click", () => {
         window.open(TELEGRAM_URL, "_blank");
-    });
-
-    document.getElementById("rowContact").addEventListener("click", () => {
-        window.open(TELEGRAM_SUPPORT_URL, "_blank");
-    });
-
-    // نوافذ المعلومات المنبثقة
-    function showInfoModal(title, content) {
-        txtDialogTitle.textContent = title;
-        infoDialogBody.innerHTML = content;
-        infoDialogModal.style.display = "flex";
-    }
-
-    document.getElementById("rowAboutUs").addEventListener("click", () => {
-        showInfoModal(
-            isArabic ? "من نحن" : "About Us",
-            isArabic
-                ? "منصة NHN LIVE هي مشغل وسائط رياضي متقدم مصمم لعرض جداول مباريات كرة القدم والنتائج المباشرة بأعلى سرعة وكفاءة."
-                : "NHN LIVE is an advanced, lightweight sports platform built specifically to deliver real-time football fixtures and streaming."
-        );
-    });
-
-    document.getElementById("rowPrivacyPolicy").addEventListener("click", () => {
-        showInfoModal(
-            isArabic ? "سياسة الخصوصية" : "Privacy Policy",
-            isArabic
-                ? "نحن نحترم خصوصيتك ونلتزم بحمايتها. لا يتطلب التطبيق التسجيل ولا يجمع أسماء أو أرقام هواتف أو بريداً إلكترونياً."
-                : "We respect your privacy. The app requires no registration and collects no personal data, names, or emails."
-        );
-    });
-
-    document.getElementById("rowTerms").addEventListener("click", () => {
-        showInfoModal(
-            isArabic ? "شروط الاستخدام" : "Terms of Service",
-            isArabic
-                ? "يعمل الموقع كواجهة عرض ومشغل وسائط ذكي ولا يستضيف أو يبث أي قنوات أو مباريات على سيرفراته الخاصة إطلاقاً."
-                : "NHN LIVE functions strictly as a media interface and video player. The platform does NOT host or store any television streams."
-        );
-    });
-
-    btnCloseInfoDialog.addEventListener("click", () => infoDialogModal.style.display = "none");
-    infoDialogModal.addEventListener("click", (e) => {
-        if (e.target === infoDialogModal) infoDialogModal.style.display = "none";
     });
 
     // استعادة الإعدادات المحفوظة

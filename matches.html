@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NHN LIVE - Matches & Settings</title>
     <link rel="stylesheet" href="matches.css">
-    <!-- مكتبة Hls.js لتشغيل البث على جميع المتصفحات والشاشات -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body class="dark-theme">
@@ -15,7 +14,7 @@
         <header class="matches-header">
             <div class="header-left">
                 <div class="header-logo-circle">
-                    <img src="logo.png" alt="NHN LIVE" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png';">
+                    <img src="nhnlive-logo.png" alt="NHN LIVE" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/mbdy08/matches/main/ic_logo.png';">
                 </div>
                 <div class="logo-title">
                     <span class="txt-white">NHN</span> <span class="txt-red">LIVE</span>
@@ -32,10 +31,10 @@
         </header>
 
         <!-- ============================================== -->
-        <!-- قسم المباريات (Matches Section) -->
+        <!-- 1. قسم المباريات (Matches Tab)                 -->
         <!-- ============================================== -->
         <main id="sectionMatches" class="main-tab-content">
-            <!-- أزرار اختيار اليوم: الأمس / اليوم / الغد -->
+            <!-- أزرار الأيام: الأمس / اليوم / الغد -->
             <div class="days-tab-bar">
                 <button class="day-tab-btn" data-day="yesterday" id="tabYesterday">Yesterday</button>
                 <button class="day-tab-btn active" data-day="today" id="tabToday">Today</button>
@@ -48,7 +47,7 @@
                 <p id="txtLoading">Loading matches...</p>
             </div>
 
-            <!-- حاوية بطاقات المباريات -->
+            <!-- قائمة المباريات -->
             <div id="matchesListContainer" class="matches-list-container"></div>
 
             <!-- رسالة عند عدم توفر مباريات -->
@@ -58,16 +57,16 @@
         </main>
 
         <!-- ============================================== -->
-        <!-- قسم الإعدادات والمزيد (Settings Section) -->
+        <!-- 2. قسم الإعدادات والمزيد (Settings Tab)        -->
         <!-- ============================================== -->
         <main id="sectionSettings" class="main-tab-content" style="display: none;">
             <h2 id="txtSettingsMainTitle" class="settings-main-title">Settings & More</h2>
 
-            <!-- مجموعة الإعدادات العامة -->
+            <!-- مجموعة الإعدادات العامة (تم حذف الإشعارات منها) -->
             <div class="settings-group-card">
                 <h4 id="txtHeaderGeneral" class="group-header-label">General Settings</h4>
 
-                <!-- سطر اللغة -->
+                <!-- اللغة -->
                 <div class="setting-row">
                     <span id="txtLabelLanguage" class="setting-title">Language</span>
                     <div class="pill-switch-container">
@@ -76,21 +75,12 @@
                     </div>
                 </div>
 
-                <!-- سطر المظهر (Dark / Light) -->
+                <!-- المظهر -->
                 <div class="setting-row">
                     <span id="txtLabelTheme" class="setting-title">Theme</span>
                     <div class="pill-switch-container">
                         <button id="btnSettingThemeLight" class="pill-opt-btn">Light</button>
                         <button id="btnSettingThemeDark" class="pill-opt-btn active">Dark</button>
-                    </div>
-                </div>
-
-                <!-- سطر الإشعارات -->
-                <div class="setting-row">
-                    <span id="txtLabelNotification" class="setting-title">Notifications</span>
-                    <div class="pill-switch-container">
-                        <button id="btnSettingNotifOff" class="pill-opt-btn">Off</button>
-                        <button id="btnSettingNotifOn" class="pill-opt-btn active">On</button>
                     </div>
                 </div>
             </div>
@@ -115,7 +105,7 @@
                 </div>
             </div>
 
-            <!-- مجموعة المعلومات والقوانين -->
+            <!-- مجموعة المعلومات -->
             <div class="settings-group-card">
                 <h4 id="txtHeaderInfo" class="group-header-label">Information</h4>
 
@@ -142,7 +132,7 @@
         </main>
 
         <!-- ============================================== -->
-        <!-- شريط التنقل السفلي الثابت (Bottom Bar) -->
+        <!-- شريط التنقل السفلي الثابت                      -->
         <!-- ============================================== -->
         <nav class="bottom-nav-bar">
             <button id="btnNavMatches" class="nav-tab-btn active">
@@ -157,20 +147,17 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- مشغل الفيديو المنبثق بكامل الجودات (HD, SD, 4K) -->
+    <!-- المشغل المدمج المنبثق بجودات (HD / SD / 4K)    -->
     <!-- ============================================== -->
     <div id="playerOverlayModal" class="player-overlay" style="display: none;">
         <div class="player-content-box">
-            <!-- شريط الجودات العلوي المتناسق -->
             <div class="player-top-header">
-                <!-- أزرار الجودة الثلاثة -->
                 <div class="player-quality-group">
                     <button id="btnQualHd" class="quality-btn active" onclick="switchStreamQuality('HD')">HD</button>
                     <button id="btnQualSd" class="quality-btn" onclick="switchStreamQuality('SD')">SD</button>
                     <button id="btnQual4k" class="quality-btn" onclick="switchStreamQuality('4K')">4K</button>
                 </div>
 
-                <!-- عداد المشاهدين وشارة LIVE وزر الإغلاق -->
                 <div class="player-header-right">
                     <div class="live-badge-card">
                         <span>👥</span>
@@ -179,11 +166,10 @@
                         <span class="live-txt">LIVE</span>
                     </div>
 
-                    <button id="btnClosePlayer" class="btn-close-video" title="Close Player">✕</button>
+                    <button id="btnClosePlayer" class="btn-close-video" title="Close">✕</button>
                 </div>
             </div>
 
-            <!-- حاوية الفيديو -->
             <div class="video-screen-wrapper">
                 <video id="hlsVideoPlayer" controls playsinline autoplay></video>
                 <div id="playerBuffering" class="player-buffering" style="display: none;">
@@ -193,14 +179,45 @@
         </div>
     </div>
 
-    <!-- النوافذ المنبثقة للمعلومات (About / Privacy / Terms / Contact) -->
-    <div id="infoDialogModal" class="modal-backdrop" style="display: none;">
-        <div class="info-dialog-card">
-            <div class="info-dialog-header">
-                <h3 id="txtDialogTitle">Title</h3>
-                <button id="btnCloseInfoDialog" class="btn-close-dialog">✕</button>
+    <!-- ============================================== -->
+    <!-- شاشة المعلومات الكاملة (About / Privacy / Terms) -->
+    <!-- ============================================== -->
+    <div id="fullInfoOverlay" class="full-info-overlay" style="display: none;">
+        <div class="full-info-window">
+            <div class="info-top-nav">
+                <button id="btnCloseFullInfo" class="btn-back-info">✕</button>
+                <h3 id="txtInfoNavTitle">Information</h3>
+                <div style="width: 28px;"></div>
             </div>
-            <div id="infoDialogBody" class="info-dialog-body"></div>
+
+            <div class="info-hero-area">
+                <h2 id="txtInfoHeroTitle">Title</h2>
+                <p id="txtInfoHeroSubtitle">Subtitle</p>
+            </div>
+
+            <div id="infoCardsList" class="info-cards-list"></div>
+
+            <div class="info-copyright-footer">
+                NHN LIVE © 2026<br>All Rights Reserved
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- نافذة Contact Support & Ads المنبثقة            -->
+    <!-- ============================================== -->
+    <div id="contactModalDialog" class="modal-backdrop" style="display: none;">
+        <div class="contact-card">
+            <h3 id="txtContactDialogTitle">Contact Support & Ads</h3>
+            <p id="txtContactDialogSub">Choose your preferred contact method:</p>
+
+            <button id="btnContactTelegram" class="btn-contact-telegram">
+                Telegram: @nhnlive_support
+            </button>
+
+            <!-- <button id="btnContactEmail" class="btn-contact-email">
+                Email: admin@nhnlive.com
+            </button> -->
         </div>
     </div>
 

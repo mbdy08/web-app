@@ -1,3 +1,9 @@
+// إذا كان المستخدم قد فعّل الكود سابقاً، يتم توجيهه للمباريات فوراً دون طلب الكود
+    if (localStorage.getItem("NHN_LIVE_LOGGED_IN") === "true") {
+        window.location.href = "matches.html";
+        return;
+    }
+
 document.addEventListener("DOMContentLoaded", () => {
     const SECRET_CODE = "7777";
 
