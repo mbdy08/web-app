@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NHN LIVE - Matches & Settings</title>
     <link rel="stylesheet" href="matches.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -123,12 +123,12 @@
     </div>
 
     <!-- ============================================================= -->
-    <!-- مشغل دراما لايف الاحترافي المطور (خبط لزق من الصورة الأخيرة)   -->
+    <!-- مشغل دراما لايف المتطور (المعدل والمثبت بنسبة 100% للموبايل)    -->
     <!-- ============================================================= -->
     <div id="playerOverlayModal" class="drama-player-modal" style="display: none;">
         <div class="drama-player-wrapper" id="playerViewport">
             
-            <!-- 1. الشريط العلوي (زر الرجوع + عنوان القناة/المباراة + زر التحديث) -->
+            <!-- الشريط العلوي -->
             <div class="drama-channel-header" id="dramaChannelHeader">
                 <button id="btnClosePlayer" class="drama-header-btn" title="Back">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -139,14 +139,14 @@
                 <div class="drama-header-title-box">
                     <span id="txtPlayerChannelTitle" class="drama-channel-name">NHN LIVE Stream</span>
                 </div>
-                <button id="btnPlayerRefresh" class="drama-header-btn" title="Refresh Stream">
+                <button id="btnPlayerRefresh" class="drama-header-btn" title="Refresh">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21.5 2v6h-6M21.34 15.57a9 9 0 1 1-.57-8.38l5.67-5.67"/>
                     </svg>
                 </button>
             </div>
 
-            <!-- حاوية الفيديو وشاشته -->
+            <!-- حاوية شاشة الفيديو التفاعلية -->
             <div class="drama-video-container" id="videoContainerBox">
                 <video id="hlsVideoPlayer" playsinline></video>
                 
@@ -154,17 +154,15 @@
                     <div class="spinner"></div>
                 </div>
 
-                <!-- 2. كبسولة السيرفرات العائمة العلوية داخل الفيديو -->
+                <!-- كبسولة السيرفرات العائمة داخل شاشة الفيديو -->
                 <div class="drama-servers-capsule" id="dramaServersCapsule">
-                    <!-- خيار الخوادم -->
                     <div class="servers-label-badge" id="btnReloadServer">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
                             <path d="M21.5 2v6h-6M21.34 15.57a9 9 0 1 1-.57-8.38l5.67-5.67"/>
                         </svg>
                         <span id="lblServersTxt">الخوادم</span>
                     </div>
 
-                    <!-- أزرار الجودات والسيرفرات (1 HD / 2 SD / 3 4K) -->
                     <div class="servers-pills-row">
                         <button id="btnQualHd" class="server-circle-btn active" onclick="switchStreamQuality('HD')">
                             <span class="server-num">1</span>
@@ -180,14 +178,11 @@
                         </button>
                     </div>
 
-                    <!-- فاصل رأسي -->
                     <div class="capsule-sep"></div>
 
-                    <!-- أزرار التحكم الجانبية في الكبسولة -->
                     <div class="capsule-actions-row">
-                        <!-- زر أبعاد الشاشة والنقاط الثلاث -->
                         <button id="btnAspectRatio" class="capsule-icon-btn" title="حجم الشاشة">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
                                 <rect x="3" y="4" width="18" height="13" rx="2"></rect>
                                 <circle cx="7" cy="20" r="1.5" fill="#FFFFFF"></circle>
                                 <circle cx="12" cy="20" r="1.5" fill="#FFFFFF"></circle>
@@ -195,31 +190,28 @@
                             </svg>
                         </button>
 
-                        <!-- زر التوسيع والمحاذاة -->
                         <button id="btnCenterAlign" class="capsule-icon-btn" title="توسيع">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
                                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
                             </svg>
                         </button>
 
-                        <!-- شارة المشاهدين المباشرة -->
                         <div class="drama-live-viewers-pill">
                             <span class="viewers-ico">👥</span>
-                            <span id="txtViewersCount">5.8K</span>
+                            <span id="txtViewersCount">12</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. شريط التقدم الأحمر السفلي -->
+                <!-- شريط التقدم الأحمر السفلي -->
                 <div class="drama-scrubber-track" id="scrubContainer">
                     <div class="drama-scrubber-fill" id="scrubFill"></div>
                     <div class="drama-scrubber-thumb"></div>
                 </div>
 
-                <!-- 4. شريط التحكم السفلي (زر التشغيل المربع + LIVE + الصوت + التوسيع القُطري) -->
+                <!-- شريط التحكم السفلي (المثبت بوضوح دائماً على شاشات الموبايل) -->
                 <div class="drama-bottom-controls" id="dramaBottomControls">
                     <div class="ctrl-left-side">
-                        <!-- زر التشغيل / الإيقاف المربع نصف الشفاف -->
                         <button id="btnTogglePlay" class="drama-square-play-btn" title="Play / Pause">
                             <svg id="iconPlay" width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF" style="display: none; margin-left: 2px;">
                                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -230,7 +222,6 @@
                             </svg>
                         </button>
 
-                        <!-- مؤشر البث المباشر الأحمر -->
                         <div class="drama-live-indicator">
                             <span class="drama-live-dot"></span>
                             <span class="drama-live-txt">LIVE</span>
@@ -238,7 +229,6 @@
                     </div>
 
                     <div class="ctrl-right-side">
-                        <!-- أيقونة الصوت وأشرطة المعادل الرأسية -->
                         <div class="drama-volume-box" id="btnToggleMute">
                             <svg id="iconVolume" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
                                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -249,7 +239,6 @@
                             </div>
                         </div>
 
-                        <!-- زر ملء الشاشة القُطري -->
                         <button id="btnOrientationToggle" class="drama-diag-expand-btn" title="Fullscreen">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
                                 <polyline points="15 3 21 3 21 9"></polyline>
@@ -293,6 +282,9 @@
             <button id="btnContactEmail" class="btn-contact-email">Email: admin@nhnlive.com</button>
         </div>
     </div>
+
+    <!-- عنصر الإشعار السفلي التوست البديل عن النافذة البيضاء -->
+    <div id="nhnToast" class="nhn-toast-msg"></div>
 
     <script src="matches.js"></script>
 </body>

@@ -381,40 +381,46 @@ body.light-theme .bottom-nav-bar {
 }
 
 /* ============================================================= */
-/* ستايل مشغل دراما لايف (خبط لزق من صورة دراما لايف الأخيرة)      */
+/* حل مشكلة ظهور المشغل على الموبايل بدقة (100dvh + Fixed Inset) */
 /* ============================================================= */
 .drama-player-modal {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh; /* لحساب شريط متصفح الموبايل بدقة متناهية */
     background-color: #000000;
     z-index: 5000;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .drama-player-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     background-color: #000000;
+    overflow: hidden;
 }
 
-/* 1. الشريط العلوي */
+/* الشريط العلوي */
 .drama-channel-header {
     width: 100%;
-    height: 52px;
+    height: 50px;
+    min-height: 50px;
     background-color: #06090E;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 16px;
-    z-index: 20;
+    z-index: 40;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -427,34 +433,33 @@ body.light-theme .bottom-nav-bar {
     align-items: center;
     justify-content: center;
     padding: 6px;
-    transition: transform 0.15s;
 }
 
 .drama-header-btn:active {
-    transform: scale(0.88);
+    transform: scale(0.9);
 }
 
 .drama-header-title-box {
     flex: 1;
     text-align: center;
-    padding: 0 12px;
+    padding: 0 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .drama-channel-name {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 800;
     color: #FFFFFF;
-    letter-spacing: 0.3px;
 }
 
-/* حاوية شاشة الفيديو */
+/* حاوية الفيديو */
 .drama-video-container {
     position: relative;
     width: 100%;
     flex: 1;
+    min-height: 0;
     background-color: #000000;
     display: flex;
     justify-content: center;
@@ -469,7 +474,7 @@ body.light-theme .bottom-nav-bar {
     transition: object-fit 0.2s ease;
 }
 
-/* 2. كبسولة السيرفرات العائمة (مطابقة للصورة بدقة) */
+/* كبسولة السيرفرات العائمة داخل الفيديو */
 .drama-servers-capsule {
     position: absolute;
     top: 14px;
@@ -478,43 +483,38 @@ body.light-theme .bottom-nav-bar {
     background-color: rgba(14, 18, 25, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 28px;
-    height: 48px;
+    height: 46px;
     display: flex;
     align-items: center;
     padding: 0 8px;
     gap: 8px;
-    z-index: 15;
+    z-index: 35;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-    direction: ltr; /* اتجاه الأزرار */
+    direction: ltr;
     transition: opacity 0.3s ease;
+    max-width: 95%;
 }
 
-/* زر الخوادم */
 .servers-label-badge {
     display: flex;
     align-items: center;
     gap: 6px;
     color: #FFFFFF;
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 800;
-    padding: 6px 10px;
+    padding: 6px 8px;
     cursor: pointer;
-    border-radius: 16px;
-    transition: background 0.2s;
-}
-
-.servers-label-badge:active {
-    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
 }
 
 .servers-pills-row {
     display: flex;
-    gap: 6px;
+    gap: 5px;
 }
 
 .server-circle-btn {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background-color: #1A212E;
     border: 1.5px solid transparent;
@@ -528,7 +528,7 @@ body.light-theme .bottom-nav-bar {
 }
 
 .server-circle-btn .server-num {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 900;
     line-height: 1;
 }
@@ -540,29 +540,28 @@ body.light-theme .bottom-nav-bar {
     margin-top: 1px;
 }
 
-/* حالة السيرفر النشط (أبيض مع حواف بارزة مثل 1 DL في الصورة) */
 .server-circle-btn.active {
     background-color: #273142;
     border-color: #FFFFFF;
     color: #FFFFFF;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
 .capsule-sep {
     width: 1px;
-    height: 22px;
+    height: 20px;
     background-color: rgba(255, 255, 255, 0.15);
 }
 
 .capsule-actions-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .capsule-icon-btn {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background-color: #1A212E;
     border: none;
@@ -571,43 +570,39 @@ body.light-theme .bottom-nav-bar {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-}
-
-.capsule-icon-btn:active {
-    transform: scale(0.9);
-    background-color: #263144;
+    transition: background 0.2s;
 }
 
 .drama-live-viewers-pill {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     background-color: #1A212E;
-    padding: 6px 12px;
-    border-radius: 18px;
-    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 16px;
+    font-size: 11.5px;
     font-weight: 800;
     color: #FFFFFF;
 }
 
-/* 3. شريط التقدم الأحمر السفلي */
+/* شريط التقدم الأحمر السفلي - تم رفعه وتثبيته فوق شريط الأزرار */
 .drama-scrubber-track {
     position: absolute;
-    bottom: 54px;
+    bottom: calc(52px + env(safe-area-inset-bottom, 10px));
     left: 0;
     width: 100%;
     height: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    z-index: 15;
+    z-index: 35;
+    transition: opacity 0.3s ease;
 }
 
 .drama-scrubber-fill {
     width: 100%;
     height: 3.5px;
-    background-color: #FF2442; /* أحمر فاقع مثل دراما لايف */
+    background-color: #FF2442;
 }
 
 .drama-scrubber-thumb {
@@ -619,18 +614,18 @@ body.light-theme .bottom-nav-bar {
     margin-left: -5px;
 }
 
-/* 4. شريط التحكم السفلي */
+/* شريط التحكم السفلي - مثبت دائماً فوق حافة الموبايل بنسبة 100% */
 .drama-bottom-controls {
     position: absolute;
-    bottom: 10px;
+    bottom: env(safe-area-inset-bottom, 10px);
     left: 0;
     width: 100%;
-    height: 44px;
+    height: 48px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 16px;
-    z-index: 15;
+    z-index: 35;
     direction: ltr;
     transition: opacity 0.3s ease;
 }
@@ -638,14 +633,13 @@ body.light-theme .bottom-nav-bar {
 .ctrl-left-side {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 }
 
-/* زر التشغيل المربع الرمادي الشفاف */
 .drama-square-play-btn {
     width: 36px;
     height: 36px;
-    background-color: rgba(255, 255, 255, 0.18);
+    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     border: none;
     display: flex;
@@ -653,12 +647,6 @@ body.light-theme .bottom-nav-bar {
     align-items: center;
     cursor: pointer;
     backdrop-filter: blur(4px);
-    transition: background 0.2s, transform 0.15s;
-}
-
-.drama-square-play-btn:active {
-    transform: scale(0.9);
-    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .drama-live-indicator {
@@ -690,21 +678,16 @@ body.light-theme .bottom-nav-bar {
 .ctrl-right-side {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
-/* أيقونة الصوت ومعادل الصوت الرأسي */
 .drama-volume-box {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     cursor: pointer;
     padding: 6px 8px;
     border-radius: 12px;
-}
-
-.drama-volume-box:active {
-    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .drama-eq-bars {
@@ -736,17 +719,41 @@ body.light-theme .bottom-nav-bar {
     align-items: center;
     justify-content: center;
     padding: 6px;
-    transition: transform 0.15s;
 }
 
-.drama-diag-expand-btn:active {
-    transform: scale(0.88);
-}
-
-/* فئات إخفاء التحكم التلقائي باللمس */
+/* إخفاء عناصر التحكم بسلاسة */
 .controls-fade-out {
     opacity: 0 !important;
     pointer-events: none !important;
+}
+
+/* ============================================================= */
+/* إشعار التوست السفلي الأنيق البديل عن النافذة البيضاء المزعجة     */
+/* ============================================================= */
+.nhn-toast-msg {
+    position: fixed;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background-color: rgba(20, 24, 34, 0.96);
+    color: #FFFFFF;
+    padding: 10px 22px;
+    border-radius: 22px;
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 99999;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(229, 37, 53, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+}
+
+.nhn-toast-msg.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* باقي الأدوات العامة */
@@ -819,4 +826,13 @@ body.light-theme .bottom-nav-bar {
 .info-cards-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
 .info-card-item { background-color: #161B24; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; border: 1px solid #1C222F; }
 .info-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.info-card-title { font-size: 15.5px; font-weight: 8
+.info-card-title { font-size: 15.5px; font-weight: 800; color: #FFFFFF; }
+.info-card-badge { width: 28px; height: 28px; border-radius: 50%; background-color: #E52535; color: #FFFFFF; font-size: 13px; font-weight: 800; display: flex; justify-content: center; align-items: center; }
+.info-card-body { font-size: 13.5px; color: #A0AEC0; line-height: 1.6; white-space: pre-line; }
+.info-copyright-footer { text-align: center; font-size: 12px; color: #555E70; line-height: 1.6; margin-top: auto; padding-top: 20px; }
+
+.contact-card { background-color: #161B24; border-radius: 24px; padding: 24px 20px; width: 100%; max-width: 330px; display: flex; flex-direction: column; text-align: center; border: 1px solid #1E2533; }
+.contact-card h3 { font-size: 18px; font-weight: 800; color: #FFFFFF; margin-bottom: 6px; }
+.contact-card p { font-size: 13px; color: #8E95A5; margin-bottom: 20px; }
+.btn-contact-telegram { width: 100%; height: 50px; border-radius: 25px; background-color: #E52535; color: #FFFFFF; border: none; font-size: 14.5px; font-weight: 800; margin-bottom: 12px; cursor: pointer; }
+.btn-contact-email { width: 100%; height: 50px; border-radius: 25px; background-color: #1F2633; color: #FFFFFF; border: none; font-size: 14px; font-weight: 700; cursor: pointer; }

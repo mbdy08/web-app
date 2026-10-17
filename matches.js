@@ -16,13 +16,32 @@ document.addEventListener("DOMContentLoaded", () => {
     let isArabic = false;
     let isDarkMode = true;
 
-    // حالة المشغل المتقدم
+    // حالة المشغل
     let currentStreams = { HD: "", SD: "", "4K": "" };
     let currentActiveQuality = "HD";
     let hlsInstance = null;
-    let uiHideTimeout = null;
+    let uiHideTimer = null;
     let aspectModes = ["contain", "cover", "fill"];
     let currentAspectIndex = 0;
+
+    // =============================================================
+    // دالة التوست الأنيقة البديلة عن النوافذ البيضاء المزعجة
+    // =============================================================
+    function showToast(message) {
+        let toast = document.getElementById("nhnToast");
+        if (!toast) {
+            toast = document.createElement("div");
+            toast.id = "nhnToast";
+            toast.className = "nhn-toast-msg";
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toast.timeoutId);
+        toast.timeoutId = setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2400);
+    }
 
     const detailedInfoData = {
         about: {
@@ -133,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
             privacyPolicy: "Privacy Policy",
             terms: "Terms of Service",
             contact: "Contact Support & Ads",
+            servers: "Servers",
             shareMessage: "⚽ Download NHN LIVE app for live match schedules:\n" + APP_DOWNLOAD_URL
         },
         ar: {
@@ -158,11 +178,12 @@ document.addEventListener("DOMContentLoaded", () => {
             privacyPolicy: "سياسة الخصوصية",
             terms: "شروط الاستخدام",
             contact: "اتصل بنا (الدعم الفني والرعايات)",
+            servers: "الخوادم",
             shareMessage: "⚽ حمّل الآن تطبيق NHN LIVE لمتابعة المباريات وجداول البث المباشر بأعلى جودة:\n" + APP_DOWNLOAD_URL
         }
     };
 
-    // عناصر الواجهة الأساسية
+    // عناصر الواجهة
     const sectionMatches = document.getElementById("sectionMatches");
     const sectionSettings = document.getElementById("sectionSettings");
     const btnNavMatches = document.getElementById("btnNavMatches");
@@ -178,40 +199,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const noMatchesBox = document.getElementById("noMatchesBox");
     const btnTopTelegram = document.getElementById("btnTopTelegram");
 
-    // عناصر مشغل الفيديو الاحترافي
+    // عناصر المشغل
     const playerOverlayModal = document.getElementById("playerOverlayModal");
-    const playerViewport = document.getElementById("playerViewport");
-    const playerUiLayer = document.getElementById("playerUiLayer");
+    const videoContainerBox = document.getElementById("videoContainerBox");
     const hlsVideoPlayer = document.getElementById("hlsVideoPlayer");
     const playerBuffering = document.getElementById("playerBuffering");
     const btnClosePlayer = document.getElementById("btnClosePlayer");
+    const btnPlayerRefresh = document.getElementById("btnPlayerRefresh");
+    const btnReloadServer = document.getElementById("btnReloadServer");
+    const txtPlayerChannelTitle = document.getElementById("txtPlayerChannelTitle");
+
+    const dramaServersCapsule = document.getElementById("dramaServersCapsule");
+    const dramaBottomControls = document.getElementById("dramaBottomControls");
+    const scrubContainer = document.getElementById("scrubContainer");
 
     const btnQualHd = document.getElementById("btnQualHd");
     const btnQualSd = document.getElementById("btnQualSd");
     const btnQual4k = document.getElementById("btnQual4k");
     const txtViewersCount = document.getElementById("txtViewersCount");
 
-    const btnSeekRewind = document.getElementById("btnSeekRewind");
-    const btnSeekForward = document.getElementById("btnSeekForward");
     const btnTogglePlay = document.getElementById("btnTogglePlay");
     const iconPlay = document.getElementById("iconPlay");
     const iconPause = document.getElementById("iconPause");
 
-    const txtCurrentTime = document.getElementById("txtCurrentTime");
-    const txtTotalDuration = document.getElementById("txtTotalDuration");
-    const scrubFill = document.getElementById("scrubFill");
-    const scrubContainer = document.getElementById("scrubContainer");
-
-    const btnOrientationToggle = document.getElementById("btnOrientationToggle");
-    const btnMiniPlayer = document.getElementById("btnMiniPlayer");
-    const btnTrackSelection = document.getElementById("btnTrackSelection");
     const btnAspectRatio = document.getElementById("btnAspectRatio");
-
-    const trackSelectionModal = document.getElementById("trackSelectionModal");
-    const btnCancelTrackModal = document.getElementById("btnCancelTrackModal");
+    const btnCenterAlign = document.getElementById("btnCenterAlign");
+    const btnOrientationToggle = document.getElementById("btnOrientationToggle");
+    const btnToggleMute = document.getElementById("btnToggleMute");
 
     // ==========================================
-    // 1. جلب المباريات من السحابة (GitHub JSON)
+    // 1. جلب وعرض المباريات
     // ==========================================
     async function fetchMatches() {
         if (loadingMatches) loadingMatches.style.display = "block";
@@ -316,7 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                     </div>
 
-                    <button class="btn-watch-match" data-hd="${match.streamHd}" data-sd="${match.streamSd}" data-4k="${match.stream4k}" data-viewers="${match.viewers}">
+                    <button class="btn-watch-match" data-hd="${match.streamHd}" data-sd="${match.streamSd}" data-4k="${match.stream4k}" data-viewers="${match.viewers}" data-title="${match.homeTeam} - ${match.awayTeam} | ${match.league}">
                         <span>${i18n[isArabic ? "ar" : "en"].watchNow}</span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                     </button>
@@ -329,7 +346,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         "4K": this.getAttribute("data-4k")
                     };
                     const vCount = this.getAttribute("data-viewers");
-                    openLivePlayer(streams, vCount);
+                    const mTitle = this.getAttribute("data-title");
+                    openDramaLivePlayer(streams, vCount, mTitle);
                 });
 
                 matchesListContainer.appendChild(card);
@@ -342,22 +360,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tabTomorrow) tabTomorrow.addEventListener("click", () => filterMatchesByDay("tomorrow"));
 
     // ==========================================
-    // 2. منطق المشغل الاحترافي المتكامل
+    // 2. منطق المشغل الاحترافي
     // ==========================================
-    function openLivePlayer(streams, viewers) {
+    function openDramaLivePlayer(streams, viewers, title) {
         currentStreams = streams;
         if (txtViewersCount) txtViewersCount.textContent = viewers || "12";
+        if (txtPlayerChannelTitle) txtPlayerChannelTitle.textContent = title || "NHN LIVE Stream";
         currentActiveQuality = streams.HD ? "HD" : (streams.SD ? "SD" : "4K");
 
         if (playerOverlayModal) playerOverlayModal.style.display = "flex";
         updateQualityButtonsUI();
         playStreamUrl(currentStreams[currentActiveQuality]);
-        resetUiHideTimer();
+        scheduleControlsFade();
     }
 
     function playStreamUrl(url) {
         if (!url) {
-            alert(isArabic ? "هذه الجودة غير متوفرة لهذا البث" : "This quality stream is not available");
+            showToast(isArabic ? "هذه الجودة غير متوفرة لهذا البث" : "This quality stream is not available");
             return;
         }
 
@@ -371,7 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
             hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
                 if (playerBuffering) playerBuffering.style.display = "none";
                 hlsVideoPlayer.play().catch(() => {});
-                updatePlayPauseIcons(false);
+                updatePlayPauseState(false);
             });
             hlsInstance.on(Hls.Events.ERROR, () => {
                 if (playerBuffering) playerBuffering.style.display = "none";
@@ -381,14 +400,14 @@ document.addEventListener("DOMContentLoaded", () => {
             hlsVideoPlayer.addEventListener("loadedmetadata", () => {
                 if (playerBuffering) playerBuffering.style.display = "none";
                 hlsVideoPlayer.play().catch(() => {});
-                updatePlayPauseIcons(false);
+                updatePlayPauseState(false);
             });
         }
     }
 
     window.switchStreamQuality = function(q) {
         if (!currentStreams[q]) {
-            alert(isArabic ? `جودة ${q} غير متوفرة` : `${q} quality is not available`);
+            showToast(isArabic ? `جودة ${q} غير متوفرة` : `${q} quality is not available`);
             return;
         }
         currentActiveQuality = q;
@@ -402,7 +421,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (btnQual4k) btnQual4k.classList.toggle("active", currentActiveQuality === "4K");
     }
 
-    // زر إرجاع وإغلاق المشغل
     if (btnClosePlayer) {
         btnClosePlayer.addEventListener("click", () => {
             if (playerOverlayModal) playerOverlayModal.style.display = "none";
@@ -420,109 +438,74 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // إخفاء وإظهار الواجهة تلقائياً باللمس
-    function resetUiHideTimer() {
-        if (playerUiLayer) playerUiLayer.classList.remove("controls-hidden");
-        clearTimeout(uiHideTimeout);
-        uiHideTimeout = setTimeout(() => {
-            if (!hlsVideoPlayer.paused && playerUiLayer) {
-                playerUiLayer.classList.add("controls-hidden");
-            }
-        }, 3500);
+    function reloadCurrentStream() {
+        if (currentStreams[currentActiveQuality]) {
+            playStreamUrl(currentStreams[currentActiveQuality]);
+            showToast(isArabic ? "تم تحديث البث" : "Stream refreshed");
+        }
     }
+    if (btnPlayerRefresh) btnPlayerRefresh.addEventListener("click", reloadCurrentStream);
+    if (btnReloadServer) btnReloadServer.addEventListener("click", reloadCurrentStream);
 
-    if (playerViewport) {
-        playerViewport.addEventListener("click", (e) => {
-            if (e.target === hlsVideoPlayer || e.target === playerViewport) {
-                if (playerUiLayer.classList.contains("controls-hidden")) {
-                    resetUiHideTimer();
-                } else {
-                    playerUiLayer.classList.add("controls-hidden");
-                }
-            } else {
-                resetUiHideTimer();
-            }
-        });
-    }
-
-    // أزرار التحكم الوسطى
-    function updatePlayPauseIcons(isPaused) {
+    function updatePlayPauseState(isPaused) {
         if (iconPlay) iconPlay.style.display = isPaused ? "block" : "none";
         if (iconPause) iconPause.style.display = isPaused ? "none" : "block";
     }
 
     if (btnTogglePlay) {
-        btnTogglePlay.addEventListener("click", () => {
+        btnTogglePlay.addEventListener("click", (e) => {
+            e.stopPropagation();
             if (hlsVideoPlayer.paused) {
                 hlsVideoPlayer.play();
-                updatePlayPauseIcons(false);
+                updatePlayPauseState(false);
             } else {
                 hlsVideoPlayer.pause();
-                updatePlayPauseIcons(true);
+                updatePlayPauseState(true);
             }
-            resetUiHideTimer();
+            scheduleControlsFade();
         });
     }
 
-    if (btnSeekRewind) {
-        btnSeekRewind.addEventListener("click", () => {
-            hlsVideoPlayer.currentTime = Math.max(0, hlsVideoPlayer.currentTime - 10);
-            resetUiHideTimer();
+    if (btnToggleMute) {
+        btnToggleMute.addEventListener("click", (e) => {
+            e.stopPropagation();
+            hlsVideoPlayer.muted = !hlsVideoPlayer.muted;
+            btnToggleMute.classList.toggle("muted", hlsVideoPlayer.muted);
+            scheduleControlsFade();
         });
     }
 
-    if (btnSeekForward) {
-        btnSeekForward.addEventListener("click", () => {
-            hlsVideoPlayer.currentTime = hlsVideoPlayer.currentTime + 10;
-            resetUiHideTimer();
+    if (btnAspectRatio) {
+        btnAspectRatio.addEventListener("click", (e) => {
+            e.stopPropagation();
+            currentAspectIndex = (currentAspectIndex + 1) % aspectModes.length;
+            const chosen = aspectModes[currentAspectIndex];
+            hlsVideoPlayer.style.objectFit = chosen;
+            const namesAr = { contain: "الحجم الأصلي (Fit)", cover: "ملء الشاشة (Cover)", fill: "تمديد (Stretch)" };
+            const namesEn = { contain: "Original (Fit)", cover: "Full Screen (Cover)", fill: "Stretch" };
+            showToast(isArabic ? namesAr[chosen] : namesEn[chosen]);
+            scheduleControlsFade();
         });
     }
 
-    // تحديث شريط الوقت
-    hlsVideoPlayer.addEventListener("timeupdate", () => {
-        const cur = hlsVideoPlayer.currentTime || 0;
-        const dur = hlsVideoPlayer.duration;
-        const formatTime = (secs) => {
-            const m = Math.floor(secs / 60);
-            const s = Math.floor(secs % 60);
-            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-        };
-
-        if (txtCurrentTime) txtCurrentTime.textContent = formatTime(cur);
-
-        if (dur && !isNaN(dur) && isFinite(dur)) {
-            if (txtTotalDuration) txtTotalDuration.textContent = formatTime(dur);
-            const pct = (cur / dur) * 100;
-            if (scrubFill) scrubFill.style.width = `${pct}%`;
-        } else {
-            if (txtTotalDuration) txtTotalDuration.textContent = "LIVE";
-            if (scrubFill) scrubFill.style.width = "100%";
-        }
-    });
-
-    if (scrubContainer) {
-        scrubContainer.addEventListener("click", (e) => {
-            const rect = scrubContainer.getBoundingClientRect();
-            const clickPos = (e.clientX - rect.left) / rect.width;
-            if (hlsVideoPlayer.duration && isFinite(hlsVideoPlayer.duration)) {
-                hlsVideoPlayer.currentTime = clickPos * hlsVideoPlayer.duration;
-            }
-            resetUiHideTimer();
+    if (btnCenterAlign) {
+        btnCenterAlign.addEventListener("click", (e) => {
+            e.stopPropagation();
+            hlsVideoPlayer.style.objectFit = "cover";
+            showToast(isArabic ? "ملء الشاشة" : "Full View");
+            scheduleControlsFade();
         });
     }
 
-    // ==========================================
-    // 3. أزرار الأدوات السفلية (من اليمين إلى اليسار)
-    // ==========================================
-    // 1. تحويل الشاشة عمودية إلى أفقية وملء الشاشة
     if (btnOrientationToggle) {
-        btnOrientationToggle.addEventListener("click", async () => {
+        btnOrientationToggle.addEventListener("click", async (e) => {
+            e.stopPropagation();
             try {
                 if (!document.fullscreenElement) {
-                    if (playerViewport.requestFullscreen) {
-                        await playerViewport.requestFullscreen();
+                    if (videoContainerBox.requestFullscreen) {
+                        await videoContainerBox.requestFullscreen();
                     } else if (hlsVideoPlayer.webkitEnterFullscreen) {
-                        hlsVideoPlayer.webkitEnterFullscreen(); // دعم خاص لأجهزة iOS / Safari
+                        hlsVideoPlayer.webkitEnterFullscreen();
                     }
                     if (screen.orientation && screen.orientation.lock) {
                         await screen.orientation.lock("landscape").catch(() => {});
@@ -533,86 +516,44 @@ document.addEventListener("DOMContentLoaded", () => {
                         screen.orientation.unlock();
                     }
                 }
-            } catch (err) {
-                // بديل عند قيود بعض المتصفحات
-                playerViewport.classList.toggle("force-landscape");
-            }
-            resetUiHideTimer();
+            } catch (err) {}
+            scheduleControlsFade();
         });
     }
 
-    // 2. تصغير الشاشة لنافذة عائمة (Picture-in-Picture)
-    if (btnMiniPlayer) {
-        btnMiniPlayer.addEventListener("click", async () => {
-            try {
-                if (document.pictureInPictureElement) {
-                    await document.exitPictureInPicture();
-                } else if (hlsVideoPlayer.requestPictureInPicture) {
-                    await hlsVideoPlayer.requestPictureInPicture();
+    function scheduleControlsFade() {
+        if (dramaServersCapsule) dramaServersCapsule.classList.remove("controls-fade-out");
+        if (dramaBottomControls) dramaBottomControls.classList.remove("controls-fade-out");
+        if (scrubContainer) scrubContainer.classList.remove("controls-fade-out");
+        clearTimeout(uiHideTimer);
+        uiHideTimer = setTimeout(() => {
+            if (!hlsVideoPlayer.paused) {
+                if (dramaServersCapsule) dramaServersCapsule.classList.add("controls-fade-out");
+                if (dramaBottomControls) dramaBottomControls.classList.add("controls-fade-out");
+                if (scrubContainer) scrubContainer.classList.add("controls-fade-out");
+            }
+        }, 4500);
+    }
+
+    if (videoContainerBox) {
+        videoContainerBox.addEventListener("click", (e) => {
+            if (e.target === videoContainerBox || e.target === hlsVideoPlayer) {
+                const isHidden = dramaServersCapsule && dramaServersCapsule.classList.contains("controls-fade-out");
+                if (isHidden) {
+                    scheduleControlsFade();
                 } else {
-                    alert(isArabic ? "ميزة الشاشة العائمة غير مدعومة في هذا المتصفح" : "Picture-in-Picture is not supported in this browser");
+                    if (dramaServersCapsule) dramaServersCapsule.classList.add("controls-fade-out");
+                    if (dramaBottomControls) dramaBottomControls.classList.add("controls-fade-out");
+                    if (scrubContainer) scrubContainer.classList.add("controls-fade-out");
                 }
-            } catch (err) {
-                alert(isArabic ? "تعذر تشغيل الشاشة العائمة" : "Unable to activate Mini-player");
+            } else {
+                scheduleControlsFade();
             }
-            resetUiHideTimer();
-        });
-    }
-
-    // 3. نافذة Track Selection المنبثقة
-    if (btnTrackSelection) {
-        btnTrackSelection.addEventListener("click", () => {
-            if (trackSelectionModal) trackSelectionModal.style.display = "flex";
-            clearTimeout(uiHideTimeout);
-        });
-    }
-
-    if (btnCancelTrackModal) {
-        btnCancelTrackModal.addEventListener("click", () => {
-            if (trackSelectionModal) trackSelectionModal.style.display = "none";
-            resetUiHideTimer();
-        });
-    }
-
-    const btnOptAudio = document.getElementById("btnOptAudio");
-    if (btnOptAudio) {
-        btnOptAudio.addEventListener("click", () => {
-            alert(isArabic ? "المسار الصوتي: الأصلي (Stereo)" : "Audio Track: Stereo (Original)");
-            if (trackSelectionModal) trackSelectionModal.style.display = "none";
-        });
-    }
-
-    const btnOptQuality = document.getElementById("btnOptQuality");
-    if (btnOptQuality) {
-        btnOptQuality.addEventListener("click", () => {
-            alert(isArabic ? `جودة البث الحالية: ${currentActiveQuality}` : `Current Video Quality: ${currentActiveQuality}`);
-            if (trackSelectionModal) trackSelectionModal.style.display = "none";
-        });
-    }
-
-    const btnOptSubtitles = document.getElementById("btnOptSubtitles");
-    if (btnOptSubtitles) {
-        btnOptSubtitles.addEventListener("click", () => {
-            alert(isArabic ? "الترجمة غير متوفرة لهذا البث المباشر" : "Subtitles not available for this live broadcast");
-            if (trackSelectionModal) trackSelectionModal.style.display = "none";
-        });
-    }
-
-    // 4. أبعاد وحجم الشاشة (Fit, Fill, Stretch)
-    if (btnAspectRatio) {
-        btnAspectRatio.addEventListener("click", () => {
-            currentAspectIndex = (currentAspectIndex + 1) % aspectModes.length;
-            const chosen = aspectModes[currentAspectIndex];
-            hlsVideoPlayer.style.objectFit = chosen;
-            const modeNamesAr = { contain: "الحجم الأصلي (Fit)", cover: "ملء الشاشة (Fill)", fill: "تمديد الشاشة (Stretch)" };
-            const modeNamesEn = { contain: "Fit (Original)", cover: "Fill (Cropped)", fill: "Stretch" };
-            alert(isArabic ? `أبعاد الشاشة: ${modeNamesAr[chosen]}` : `Aspect Ratio: ${modeNamesEn[chosen]}`);
-            resetUiHideTimer();
         });
     }
 
     // ==========================================
-    // 4. التنقل والشاشات الأخرى
+    // 3. التنقل السفلي وباقي النوافذ
     // ==========================================
     if (btnNavMatches) {
         btnNavMatches.addEventListener("click", () => {
@@ -632,7 +573,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // الشاشات الكاملة (About / Privacy / Terms)
     const fullInfoOverlay = document.getElementById("fullInfoOverlay");
     const btnCloseFullInfo = document.getElementById("btnCloseFullInfo");
     const txtInfoNavTitle = document.getElementById("txtInfoNavTitle");
@@ -680,7 +620,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const rowTerms = document.getElementById("rowTerms");
     if (rowTerms) rowTerms.addEventListener("click", () => openDetailedSection("terms"));
 
-    // نافذة الدعم
     const contactModalDialog = document.getElementById("contactModalDialog");
     const rowContact = document.getElementById("rowContact");
     if (rowContact) {
@@ -711,7 +650,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // تطبيق اللغات والمظهر
+    // تبديل اللغات والمظهر
     const btnSettingLangEn = document.getElementById("btnSettingLangEn");
     const btnSettingLangAr = document.getElementById("btnSettingLangAr");
     const btnSettingThemeDark = document.getElementById("btnSettingThemeDark");
@@ -769,6 +708,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const txtLabelContact = document.getElementById("txtLabelContact");
         if (txtLabelContact) txtLabelContact.textContent = t.contact;
 
+        const lblServersTxt = document.getElementById("lblServersTxt");
+        if (lblServersTxt) lblServersTxt.textContent = t.servers;
+
         filterMatchesByDay(currentDayTab);
     }
 
@@ -796,7 +738,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 } catch (err) {}
             } else {
                 navigator.clipboard.writeText(msg);
-                alert(isArabic ? "تم نسخ رابط التحميل" : "Download link copied");
+                showToast(isArabic ? "تم نسخ رابط التحميل" : "Download link copied");
             }
         });
     }

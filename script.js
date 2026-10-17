@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const TELEGRAM_CHANNEL_URL = "https://t.me/nhnlive";
     const APP_DOWNLOAD_URL = "https://nhnlive.com/app/app-download.html";
 
-    // 1. إذا كان المستخدم قد فعّل الكود سابقاً، يتم توجيهه للمباريات فوراً
+    // 1. التوجيه التلقائي للمباريات إذا كان المستخدم قد فعّل الكود سابقاً
     if (localStorage.getItem("NHN_LIVE_LOGGED_IN") === "true") {
         window.location.href = "matches.html";
         return;
@@ -13,7 +13,24 @@ document.addEventListener("DOMContentLoaded", () => {
     let isArabic = false;
     let directHls = null;
 
-    // دالة مساعدة لربط الأحداث بأمان دون توقف الكود إذا لم يوجد عنصر
+    // دالة التنبيه السفلي الأنيق (Toast) البديلة عن النوافذ البيضاء المزعجة
+    function showToast(message) {
+        let toast = document.getElementById("nhnToast");
+        if (!toast) {
+            toast = document.createElement("div");
+            toast.id = "nhnToast";
+            toast.className = "nhn-toast-msg";
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toast.timeoutId);
+        toast.timeoutId = setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2400);
+    }
+
+    // دالة مساعدة لربط الأحداث بأمان دون توقف الكود
     function safeAddListener(id, event, handler) {
         const el = document.getElementById(id);
         if (el) el.addEventListener(event, handler);
@@ -116,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // عناصر الصفحة الأولى
+    // عناصر الصفحة
     const headerMainTitle = document.getElementById("headerMainTitle");
     const headerSubtitle = document.getElementById("headerSubtitle");
     const cardTopTitle = document.getElementById("cardTopTitle");
@@ -140,7 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const languageModal = document.getElementById("languageModal");
     const tvXtreamError = document.getElementById("tvXtreamError");
 
-    // المشغل المباشر للروابط الخارجية
     const directPlayerModal = document.getElementById("directPlayerModal");
     const directVideoPlayer = document.getElementById("directVideoPlayer");
 
@@ -162,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (val.startsWith("http://") || val.startsWith("https://")) {
             playRealStream(val);
         } else {
-            alert(i18n[isArabic ? "ar" : "en"].invalidCodeOrUrl);
+            showToast(i18n[isArabic ? "ar" : "en"].invalidCodeOrUrl);
         }
     }
 
@@ -299,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (code === SECRET_CODE) {
             unlockApp();
         } else {
-            alert(i18n[isArabic ? "ar" : "en"].invalidCode);
+            showToast(i18n[isArabic ? "ar" : "en"].invalidCode);
         }
     });
 
@@ -353,7 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (err) {}
         } else {
             navigator.clipboard.writeText(msg);
-            alert(isArabic ? "تم نسخ رابط التحميل" : "Download link copied");
+            showToast(isArabic ? "تم نسخ رابط التحميل" : "Download link copied");
         }
     });
 
@@ -398,12 +414,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const targetInput = document.getElementById(targetId);
             try {
                 const text = await navigator.clipboard.readText();
-                if (text && targetInput) targetInput.value = text;
-            } catch (err) {}
+                if (text && targetInput) {
+                    targetInput.value = text;
+                    showToast(isArabic ? "تم اللصق من الحافظة" : "Pasted from clipboard");
+                }
+            } catch (err) {
+                showToast(i18n[isArabic ? "ar" : "en"].clipboardEmpty);
+            }
         });
     });
 
-    // استعادة اللغة
+    // استعادة اللغة المحفوظة
     const savedLang = localStorage.getItem("NHN_LIVE_LANG");
     applyLanguage(savedLang ? savedLang === "ar" : (navigator.language || "").startsWith("ar"));
 });
