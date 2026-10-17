@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. فحص التفعيل
     if (localStorage.getItem("NHN_LIVE_LOGGED_IN") !== "true") {
         window.location.href = "index.html";
         return;
@@ -16,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let isArabic = false;
     let isDarkMode = true;
 
-    // حالة المشغل
     let currentStreams = { HD: "", SD: "", "4K": "" };
     let currentActiveQuality = "HD";
     let hlsInstance = null;
@@ -24,9 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let aspectModes = ["contain", "cover", "fill"];
     let currentAspectIndex = 0;
 
-    // =============================================================
-    // دالة التوست الأنيقة البديلة عن النوافذ البيضاء المزعجة
-    // =============================================================
     function showToast(message) {
         let toast = document.getElementById("nhnToast");
         if (!toast) {
@@ -183,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // عناصر الواجهة
     const sectionMatches = document.getElementById("sectionMatches");
     const sectionSettings = document.getElementById("sectionSettings");
     const btnNavMatches = document.getElementById("btnNavMatches");
@@ -199,7 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const noMatchesBox = document.getElementById("noMatchesBox");
     const btnTopTelegram = document.getElementById("btnTopTelegram");
 
-    // عناصر المشغل
     const playerOverlayModal = document.getElementById("playerOverlayModal");
     const videoContainerBox = document.getElementById("videoContainerBox");
     const hlsVideoPlayer = document.getElementById("hlsVideoPlayer");
@@ -227,9 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnOrientationToggle = document.getElementById("btnOrientationToggle");
     const btnToggleMute = document.getElementById("btnToggleMute");
 
-    // ==========================================
-    // 1. جلب وعرض المباريات
-    // ==========================================
     async function fetchMatches() {
         if (loadingMatches) loadingMatches.style.display = "block";
         if (matchesListContainer) matchesListContainer.innerHTML = "";
@@ -359,9 +349,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tabToday) tabToday.addEventListener("click", () => filterMatchesByDay("today"));
     if (tabTomorrow) tabTomorrow.addEventListener("click", () => filterMatchesByDay("tomorrow"));
 
-    // ==========================================
-    // 2. منطق المشغل الاحترافي
-    // ==========================================
     function openDramaLivePlayer(streams, viewers, title) {
         currentStreams = streams;
         if (txtViewersCount) txtViewersCount.textContent = viewers || "12";
@@ -488,11 +475,31 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // زر التوسيع وملء الشاشة العلوي
     if (btnCenterAlign) {
-        btnCenterAlign.addEventListener("click", (e) => {
+        btnCenterAlign.addEventListener("click", async (e) => {
             e.stopPropagation();
-            hlsVideoPlayer.style.objectFit = "cover";
-            showToast(isArabic ? "ملء الشاشة" : "Full View");
+            try {
+                if (!document.fullscreenElement) {
+                    if (videoContainerBox.requestFullscreen) {
+                        await videoContainerBox.requestFullscreen();
+                    } else if (hlsVideoPlayer.webkitEnterFullscreen) {
+                        hlsVideoPlayer.webkitEnterFullscreen();
+                    }
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock("landscape").catch(() => {});
+                    }
+                }
+            } catch (err) {}
+
+            if (hlsVideoPlayer.style.objectFit === "fill") {
+                hlsVideoPlayer.style.objectFit = "contain";
+                showToast(isArabic ? "الحجم الأصلي (Fit)" : "Original Size");
+            } else {
+                hlsVideoPlayer.style.objectFit = "fill";
+                showToast(isArabic ? "تم ملء الشاشة بالكامل" : "Full Screen Fill");
+            }
+
             scheduleControlsFade();
         });
     }
@@ -552,9 +559,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ==========================================
-    // 3. التنقل السفلي وباقي النوافذ
-    // ==========================================
     if (btnNavMatches) {
         btnNavMatches.addEventListener("click", () => {
             if (sectionSettings) sectionSettings.style.display = "none";
@@ -650,7 +654,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // تبديل اللغات والمظهر
     const btnSettingLangEn = document.getElementById("btnSettingLangEn");
     const btnSettingLangAr = document.getElementById("btnSettingLangAr");
     const btnSettingThemeDark = document.getElementById("btnSettingThemeDark");
