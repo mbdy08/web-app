@@ -9,6 +9,21 @@
     <!-- أيقونة الموقع في المتصفح وعلى شاشات الهواتف -->
     <link rel="icon" type="image/ico" href="photo_2026-08-NHN.ico">
     <link rel="apple-touch-icon" href="photo_2026-08-NHN.ico">
+
+    <style>
+        /* منع تحديد النصوص وسحب العناصر والصور */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        img, video {
+            -webkit-user-drag: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+    </style>
 </head>
 <body class="dark-theme">
 
@@ -290,5 +305,75 @@
     <div id="nhnToast" class="nhn-toast-msg"></div>
 
     <script src="matches.js"></script>
+
+    <!-- ============================================================= -->
+    <!-- كود الحماية المتقدمة: منع الفحص وسرقة الروابط (Anti-Inspect)    -->
+    <!-- ============================================================= -->
+    <script>
+        (function() {
+            // 1. منع النقر بالزر الأيمن للفأرة (Context Menu) في كامل الصفحة
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            }, { capture: true });
+
+            // 2. منع اختصارات لوحة المفاتيح المخصصة لفتح أدوات المطور وسورس الصفحة
+            document.addEventListener('keydown', function(e) {
+                // منع F12
+                if (e.keyCode === 123 || e.key === 'F12') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                // منع Ctrl+Shift+I / Cmd+Opt+I (Inspect)
+                // منع Ctrl+Shift+J / Cmd+Opt+J (Console)
+                // منع Ctrl+Shift+C / Cmd+Opt+C (Element Inspector)
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && 
+                    (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67 || 
+                     e.key === 'I' || e.key === 'J' || e.key === 'C' || 
+                     e.key === 'i' || e.key === 'j' || e.key === 'c')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                // منع Ctrl+U / Cmd+Opt+U (View Source)
+                if ((e.ctrlKey || e.metaKey) && (e.keyCode === 85 || e.key === 'u' || e.key === 'U')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                // منع Ctrl+S / Cmd+S (Save Page)
+                if ((e.ctrlKey || e.metaKey) && (e.keyCode === 83 || e.key === 's' || e.key === 'S')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, { capture: true });
+
+            // 3. كتم ومسح سجلات الكونسول لمنع قراءة الروابط المطبوعة في الخلفية
+            try {
+                if (window.console) {
+                    console.log = function() {};
+                    console.info = function() {};
+                    console.warn = function() {};
+                    console.debug = function() {};
+                }
+            } catch (err) {}
+
+            // 4. مصيدة تصحيح الأخطاء (Debugger Trap): تجميد الكونسول فوراً إذا فتحه أي شخص
+            setInterval(function() {
+                const startTime = performance.now();
+                (function() { return false; }['constructor']('debugger')());
+                const endTime = performance.now();
+                if (endTime - startTime > 100) {
+                    // إذا كان الفحص مفتوحاً، إعادة توجيه أو تحديث الصفحة
+                    window.location.reload();
+                }
+            }, 1000);
+        })();
+    </script>
 </body>
 </html>
