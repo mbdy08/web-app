@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // تحويل مسار البث تلقائياً إلى سيرفر toto10 المحمي الخاص بالموقع
-        url = url.replace(/toto9/g, "toto10");
+        url = url.replace(/ouou1/g, "uouo2");
 
         if (playerBuffering) playerBuffering.style.display = "block";
 
